@@ -4,6 +4,7 @@ import '@fontsource-variable/noto-sans-devanagari';
 import '../styles/global.css';
 import SearchDialog from '../components/SearchDialog.astro';
 import BrandLogo from '../components/BrandLogo.astro';
+import Analytics from '@vercel/analytics/astro';
 
 interface Props {
   title: string;
@@ -80,6 +81,7 @@ const year = new Date().getFullYear();
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     {jsonLd.map((o) => <script type="application/ld+json" set:html={ld(o)} />)}
+    {import.meta.env.PROD && <Analytics />}
     <script is:inline>
       // Apply saved theme and font size immediately to avoid flash
       (function () {

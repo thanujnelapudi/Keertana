@@ -12,6 +12,7 @@
     "@fontsource-variable/noto-sans-devanagari": "^5.3.0",
     "@fontsource-variable/noto-sans-telugu": "^5.3.0",
     "@tailwindcss/vite": "^4.3.3",
+    "@vercel/analytics": "^2.0.1",
     "astro": "^5.18.2",
     "tailwindcss": "^4.3.3"
   },

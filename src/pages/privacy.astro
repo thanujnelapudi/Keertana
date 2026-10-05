@@ -9,7 +9,7 @@ const contents = [
 ---
 <Information title="Privacy Policy" description="What the current Keertana site does with form details, browser storage, and requests to external services." policy contents={contents}>
   <section id="information" aria-labelledby="information-heading"><h2 id="information-heading">Information and forms</h2>
-    <p>You can browse Keertana without an account. There is no account database, login, payment system, analytics script, advertising integration, or external error-reporting service configured in the application.</p>
+    <p>You can browse Keertana without an account. There is no account database, login, payment system, advertising integration, or external error-reporting service configured in the application. Vercel Web Analytics is included in production builds to understand site traffic.</p>
     <p>Contribution forms ask for the following details:</p>
     <ul>
       <li><strong>Submit a Song:</strong> title, language, lyrics, and an acknowledgement; optional Roman title, alternate title, author/composer, source/reference, category, notes, contributor name, and email.</li>
@@ -26,7 +26,7 @@ const contents = [
   </section>
   <section id="storage" aria-labelledby="storage-heading"><h2 id="storage-heading">Cookies and browser storage</h2>
     <p>Cookies use the browser’s cookie mechanism and can accompany requests to a website. Local storage is a separate browser store; Keertana’s saved library is not a cookie and is not automatically sent with page requests.</p>
-    <p>No cookie-setting code or app-configured essential, analytics, advertising, or authentication cookies were found in this version. This does not verify cookies that a deployed host or its protection settings might add. No cookie banner has been added solely for local storage.</p>
+    <p>Keertana does not set authentication or advertising cookies. Vercel Web Analytics uses a daily visitor hash rather than cookies. This does not describe cookies that a deployed host or its protection settings might add. Browser-local saved songs and preferences use local storage.</p>
     <dl class="information-storage">
       <div><dt>Saved Songs and Recently Viewed</dt><dd>Local storage keeps song identifiers in this browser. Saved songs remain until removed or cleared. Recent visits are deduplicated, ordered with the newest first, and limited to eight; older entries are replaced. Lyrics and contributor details are not copied into this store. There is no account-based synchronization.</dd></div>
       <div><dt>Display preferences</dt><dd>Local storage remembers a chosen light/dark theme and lyric font size. These are preferences for this browser, not a user profile.</dd></div>
@@ -36,7 +36,8 @@ const contents = [
   <section id="services" aria-labelledby="services-heading"><h2 id="services-heading">Services and external links</h2>
     <p>The Latin font, Inter, is requested from Google Fonts. These requests connect to Google’s font servers and expose your IP address and request information needed to deliver the font. See <a href="https://fonts.googleblog.com/2022/11/your-privacy-and-google-fonts.html" rel="external">Google’s font-service privacy explanation</a>. Telugu and Devanagari fonts are bundled with Keertana and served with the site.</p>
     <p>The project’s default public address is on Vercel, but the active production hosting settings and enabled services have not been verified. If delivered through Vercel, that provider handles request information under its <a href="https://vercel.com/legal/privacy-notice" rel="external">Privacy Notice</a>. The owner must confirm the actual provider, logs, retention, and any dashboard-enabled analytics or protection before launch.</p>
-    <p>No embedded media, external song API, advertising service, or analytics integration is configured in the audited application. An external policy or other website link takes you to a service with its own privacy practices.</p>
+    <p><strong>Vercel Web Analytics:</strong> when enabled for the deployed project, the production site sends page-view information to Vercel for aggregated traffic statistics. This can include page URLs, referrers, filtered query parameters, timestamps, approximate location, and device, operating-system and browser information. Vercel describes this service as cookie-free, with a visitor hash that resets daily. Keertana does not configure custom events to send contribution fields, saved-song lists, or typed search terms. See <a href="https://vercel.com/docs/analytics/privacy-policy" rel="external">Vercel's analytics privacy documentation</a>.</p>
+    <p>No embedded media, external song API or advertising service is configured in the application. An external policy or other website link takes you to a service with its own privacy practices.</p>
   </section>
   <section id="retention" aria-labelledby="retention-heading"><h2 id="retention-heading">Retention and your choices</h2>
     <p>Local storage has no expiry set by Keertana. It remains until cleared by you or your browser, replaced, or removed by the application. You can remove an individual saved song with its Saved button. Clear Keertana’s site data in browser settings to remove the saved library, recent visits, preferences, and offline cache; this also removes offline availability until resources are downloaded again.</p>
