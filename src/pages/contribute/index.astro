@@ -1,0 +1,12 @@
+---
+import Contribution from '../../layouts/Contribution.astro';
+const options = [
+  { title: 'Submit a Song', href: '/contribute/submit/', description: "Know a song that isn’t in Keertana? Share its lyrics and details for review." },
+  { title: 'Report an Error', href: '/contribute/report/', description: 'Found a mistake in the lyrics, spelling, or language? Help keep the library accurate.' },
+  { title: 'Join the Team', href: '/contribute/join/', description: 'Help through content, proofreading, translation, design, development, or other areas.' },
+];
+---
+<Contribution title="Help grow Keertana." description="Help build a better multilingual library of Christian worship songs and hymns." hub>
+  <p class="contribution-notice"><strong>Contributions are being prepared.</strong> You can explore the forms and check your details. Sending is not connected yet; nothing will be submitted.</p>
+  <div class="contribution-options">{options.map(option => <section class="contribution-option"><h2>{option.title}</h2><p>{option.description}</p><a class="contribution-link" href={option.href}>{option.title} <span aria-hidden="true">&nbsp;→</span></a></section>)}</div>
+</Contribution>

@@ -1,0 +1,33 @@
+---
+import Information from '../layouts/Information.astro';
+const contents = [{id:'use',label:'Using Keertana'},{id:'contributions',label:'Contributions'},{id:'rights',label:'Content and rights'},{id:'corrections',label:'Corrections and concerns'},{id:'availability',label:'Accuracy and availability'},{id:'changes',label:'Changes and questions'}];
+---
+<Information title="Terms of Use" description="Using the worship-song library and its current contribution tools." policy contents={contents}>
+  <section id="use" aria-labelledby="use-heading"><h2 id="use-heading">Using Keertana</h2>
+    <p>Keertana helps people discover and read Christian worship songs and hymns in Telugu, Hindi, and English. Use the site respectfully. Do not misuse contribution tools to send spam, harass others, impersonate a person, submit malicious content, or interfere with the site’s operation.</p>
+    <p>No account, payment, or membership is required to browse this version. Browser features such as Saved Songs are local to your browser and do not create an account.</p>
+  </section>
+  <section id="contributions" aria-labelledby="contributions-heading"><h2 id="contributions-heading">Contributions</h2>
+    <p>Forms support preparing song lyrics and details, corrections, Roman titles, source information, and an expression of interest in helping the project. Sending is not connected yet: checking a form does not submit it, publish it, or enroll you in a team.</p>
+    <p>Provide information that is accurate to the best of your knowledge. Identify sources and known authors or composers where possible. Do not present another person’s work as your own, share private information without permission, or provide material you are not permitted to share. If supplying a reference rather than authorized lyrics, make that distinction clear in the notes.</p>
+    <p>Contribution permissions and a review process will be established before submissions are enabled. Checking a form does not transfer ownership, grant a license, or promise publication or a response.</p>
+  </section>
+  <section id="rights" aria-labelledby="rights-heading"><h2 id="rights-heading">Content and rights</h2>
+    <p>Keertana is a resource to help people find lyrics, sing praise, and worship God. It does not claim copyright ownership of the songs or lyrics displayed here. All song credit and applicable rights belong to their respective authors, composers, and rights holders.</p>
+    <p>Access to a song on this site is not permission to reproduce, distribute, adapt, publish, or perform it. Rights and permissions depend on the individual work and intended use. Do not assume that lyrics are public domain, licensed for unrestricted use, or owned by Keertana because they appear here.</p>
+    <p>Copy and Share are convenience tools; they do not grant additional rights. See the <a href="/copyright/">Copyright / Content Policy</a> for attribution and content concerns.</p>
+  </section>
+  <section id="corrections" aria-labelledby="corrections-heading"><h2 id="corrections-heading">Corrections and concerns</h2>
+    <p>You can prepare a correction through <a href="/contribute/report/">Report an Error</a>, including a specific song and suggested text. For rights or content concerns, use the <a href="/copyright/#concerns">copyright concerns guidance</a>. These forms do not currently deliver requests.</p>
+    <p>Entries may be corrected or removed as the collection is maintained. No automated moderation or formal takedown workflow is in place, and no outcome or processing deadline is promised.</p>
+  </section>
+  <section id="availability" aria-labelledby="availability-heading"><h2 id="availability-heading">Accuracy and availability</h2>
+    <p>Lyrics, language grouping, and transliterations can contain mistakes. Check reliable sources when accuracy or permissions matter. The library is not a definitive statement of a work’s authorship or legal status.</p>
+    <p>The site may change or be unavailable. Offline access depends on what your browser has cached; it is not a guarantee that every song is available offline. Local saved data can be lost when site data is cleared or browser storage is unavailable.</p>
+    <p>Keertana cannot guarantee uninterrupted access or complete accuracy. Nothing on this page asks you to waive legal rights or excludes obligations that cannot lawfully be excluded.</p>
+  </section>
+  <section id="changes" aria-labelledby="changes-heading"><h2 id="changes-heading">Changes and questions</h2>
+    <p>These terms will be updated when the service changes, with the last-updated date revised. The <a href="/privacy/">Privacy Policy</a> describes current data behavior.</p>
+    <p>Keertana is based in India. The <a href="/contact/">Contact page</a> lists the available contribution options.</p>
+  </section>
+</Information>

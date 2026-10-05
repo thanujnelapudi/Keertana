@@ -1,0 +1,21 @@
+# Dependencies and generated site/search output
+/node_modules/
+/dist/
+/.astro/
+/public/pagefind/
+
+# Local audits, backups and screenshots
+/.audit-build/
+/.audit-originals/
+/[{]src/
+/songs.backup.json
+/*.png
+*.log
+
+# Secrets and host-specific settings
+.env
+.env.*
+!.env.example
+/.vercel/
+.DS_Store
+Thumbs.db

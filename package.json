@@ -1,0 +1,21 @@
+{
+  "name": "keertana",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && pagefind --site dist",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/noto-sans-devanagari": "^5.3.0",
+    "@fontsource-variable/noto-sans-telugu": "^5.3.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^5.18.2",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "pagefind": "^1.5.2"
+  }
+}

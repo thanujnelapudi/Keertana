@@ -1,0 +1,113 @@
+---
+// Resolve titles from the current catalog; storage contains only stable slugs.
+import { songs, detectSongLanguage } from '../lib/songs';
+const catalog = songs.map(song => ({ slug: song.slug, title: song.title, lang: detectSongLanguage(song).langCode }));
+---
+<section id="local-library" class="local-library" hidden aria-label="Your local song library">
+  <header class="library-header">
+    <h2>Your Library</h2>
+    <p class="library-note">Saved songs and recent visits, kept in this browser.</p>
+  </header>
+  <section id="saved-songs" hidden aria-labelledby="saved-heading">
+    <h3 id="saved-heading">Saved Songs <span id="saved-count" class="library-count"></span></h3>
+    <ul id="saved-song-list" class="local-song-list"></ul>
+    <button id="saved-show-more" type="button" class="library-more" aria-expanded="false" aria-controls="saved-song-list" hidden>Show all saved songs →</button>
+  </section>
+  <section id="recent-songs" hidden aria-labelledby="recent-heading">
+    <h3 id="recent-heading">Recently Viewed</h3>
+    <ul id="recent-song-list" class="local-song-list"></ul>
+    <button id="recent-show-more" type="button" class="library-more" aria-expanded="false" aria-controls="recent-song-list" hidden>Show all recent songs →</button>
+  </section>
+  <p id="library-status" role="status" class="library-note"></p>
+</section>
+<script type="application/json" id="local-song-catalog" set:html={JSON.stringify(catalog).replace(/</g, '\\u003c')} />
+<style>
+  .local-library { margin: 0 0 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+  .library-header { margin-bottom: 1.25rem; }
+  .local-library section + section { margin-top: 1.5rem; }
+  #saved-songs { scroll-margin-top: 6rem; }
+  h2 { font-size: 1.375rem; font-weight: 600; color: var(--text); margin: 0 0 0.375rem; letter-spacing: -0.02em; }
+  h3 { font-size: 0.875rem; font-weight: 600; color: var(--text); margin: 0 0 0.5rem; }
+  #recent-heading { color: var(--text-muted); font-weight: 500; }
+  .library-count { font-size: 0.75rem; font-weight: 400; color: var(--text-muted); margin-left: 0.375rem; }
+  .library-note { font-size: 0.8125rem; color: var(--text-muted); margin: 0; }
+  #library-status:empty { display: none; }
+  #library-status { margin-top: 0.75rem; }
+  .local-song-list { list-style: none; padding: 0; margin: 0; display: grid; column-gap: 1.5rem; }
+  :global(.local-song-list li) { display: flex; align-items: center; gap: 0.5rem; min-width: 0; border-bottom: 1px solid var(--border-subtle); }
+  :global(.local-song-link) { padding: 0.75rem 0.375rem; flex: 1; min-width: 0; overflow-wrap: anywhere; line-height: 1.6; font-size: 0.9375rem; font-weight: 500; border-radius: 6px; transition: color 0.15s, background 0.15s; }
+  :global(.local-song-title) { display: block; }
+  :global(.local-song-meta) { display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 400; margin-top: 0.125rem; }
+  :global(#recent-song-list .local-song-link) { font-size: 0.875rem; font-weight: 400; color: var(--text-muted); padding-block: 0.625rem; }
+  :global(.local-song-link:hover), :global(#recent-song-list .local-song-link:hover) { color: var(--accent); background: var(--accent-bg); }
+  :global(.local-song-link:active) { background: var(--surface-subtle); }
+  :global(.remove-saved-song) { border: none; background: transparent; color: var(--accent); min-width: 44px; min-height: 44px; padding: 0.5rem; cursor: pointer; border-radius: 8px; display: flex; gap: 0.25rem; align-items: center; font-size: 0.75rem; transition: background 0.15s; }
+  :global(.remove-saved-song:hover) { color: var(--accent); background: var(--accent-bg); }
+  .library-more { background: none; border: none; padding: 0.5rem 0; min-height: 44px; color: var(--accent); font-size: 0.8125rem; cursor: pointer; }
+  .library-more:hover { text-decoration: underline; text-underline-offset: 3px; }
+  @media (min-width: 768px) { .local-song-list { grid-template-columns: 1fr 1fr; } }
+</style>
+<script>
+  import { readLibrary, updateLibrary, LIBRARY_KEY } from '../../public/local-library.js';
+  const root = document.getElementById('local-library');
+  const expanded = { saved: false, recent: false };
+  const catalog = new Map(JSON.parse(document.getElementById('local-song-catalog')!.textContent!).map(song => [song.slug, song]));
+  function renderLibrary() {
+    let library;
+    try { library = readLibrary(localStorage); } catch { return; }
+    for (const [kind, values] of [['saved', library.saved], ['recent', library.recent]] as const) {
+      const list = document.getElementById(`${kind}-song-list`)!;
+      list.replaceChildren();
+      const available = values.filter(slug => catalog.has(slug));
+      const more = document.getElementById(`${kind}-show-more`)!;
+      more.hidden = available.length <= 5;
+      more.setAttribute('aria-expanded', String(expanded[kind]));
+      more.textContent = expanded[kind] ? 'Show fewer songs ↑' : `Show all ${kind === 'saved' ? 'saved' : 'recent'} songs →`;
+      if (kind === 'saved') document.getElementById('saved-count')!.textContent = String(available.length);
+      for (const slug of (expanded[kind] ? available : available.slice(0, 5))) {
+        const song = catalog.get(slug) as { title: string; lang: string } | undefined;
+        if (!song) continue;
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.className = 'local-song-link';
+        a.href = `/song/${encodeURIComponent(slug)}/`;
+        const title = document.createElement('span');
+        title.className = 'local-song-title'; title.textContent = song.title; title.lang = song.lang;
+        const meta = document.createElement('span');
+        meta.className = 'local-song-meta'; meta.textContent = ({ te: 'Telugu', hi: 'Hindi', en: 'English' }[song.lang] || 'Song') + ' · Song';
+        a.append(title, meta);
+        li.append(a);
+        if (kind === 'saved') {
+          const remove = document.createElement('button');
+          remove.type = 'button'; remove.className = 'remove-saved-song';
+          const heart = document.createElement('span'); heart.textContent = '♥'; heart.setAttribute('aria-hidden', 'true');
+          const savedLabel = document.createElement('span'); savedLabel.textContent = 'Saved';
+          remove.append(heart, savedLabel); remove.setAttribute('aria-pressed', 'true');
+          remove.setAttribute('aria-label', `Remove ${song.title} from saved songs`);
+          remove.addEventListener('click', () => {
+            try {
+              updateLibrary(localStorage, 'remove', slug); renderLibrary();
+              document.getElementById('library-status')!.textContent = 'Song removed from Saved Songs.';
+              (document.querySelector('#saved-song-list a, #recent-song-list a') as HTMLElement)?.focus();
+            } catch { document.getElementById('library-status')!.textContent = 'Could not update saved songs in this browser.'; }
+          });
+          li.append(remove);
+        }
+        list.append(li);
+      }
+      document.getElementById(`${kind}-songs`)!.hidden = list.childElementCount === 0;
+    }
+    root!.hidden = document.getElementById('saved-songs')!.hidden && document.getElementById('recent-songs')!.hidden;
+  }
+  for (const kind of ['saved', 'recent'] as const) {
+    document.getElementById(`${kind}-show-more`)!.addEventListener('click', () => {
+      expanded[kind] = !expanded[kind]; renderLibrary();
+    });
+  }
+  try { renderLibrary(); } catch { /* Keep empty sections hidden if storage is unavailable. */ }
+  if (window.location.hash === '#saved-songs' && !document.getElementById('saved-songs')!.hidden) {
+    document.getElementById('saved-songs')!.scrollIntoView({ block: 'start' });
+  }
+  window.addEventListener('storage', event => { if (event.key === LIBRARY_KEY || event.key === null) renderLibrary(); });
+  window.addEventListener('pageshow', renderLibrary);
+</script>

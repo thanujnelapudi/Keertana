@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 104" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Keertana</title><desc id="desc">An open songbook beneath a cross, with the Keertana wordmark.</desc>
+  <g transform="translate(12 12)">
+    <rect width="80" height="80" rx="18" fill="#AA4527"/>
+    <path d="M14 32c9-3 18-1 26 4 8-5 17-7 26-4v27c-9-3-18-1-26 4-8-5-17-7-26-4V32Z" stroke="#FBF8F3" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M40 36v27M23 42c4 0 7 1 10 3m-10 5c4 0 7 1 10 3m14-8c3-2 6-3 10-3m-10 11c3-2 6-3 10-3" stroke="#FBF8F3" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M40 15v15m-6-9h12" stroke="#FBF8F3" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <text x="112" y="59" fill="#211711" font-family="Georgia, serif" font-weight="700" font-size="45" letter-spacing="-1">Keertana</text>
+  <text x="114" y="82" fill="#6C5E54" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="2.2">SONGS · HYMNS · WORSHIP</text>
+</svg>

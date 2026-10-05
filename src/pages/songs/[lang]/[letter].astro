@@ -1,0 +1,16 @@
+---
+import { getLanguagesData } from '../../../lib/songs';
+
+export function getStaticPaths() {
+  const languages = getLanguagesData();
+  return languages.flatMap((lang) =>
+    lang.letters.map((letter) => ({
+      params: { lang: lang.id, letter: letter.slug },
+      props: { langId: lang.id, char: letter.char },
+    }))
+  );
+}
+
+const { langId, char } = Astro.props;
+return Astro.redirect(`/${langId}/${encodeURIComponent(char)}/`, 301);
+---

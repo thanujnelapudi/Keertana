@@ -1,0 +1,462 @@
+---
+import Base from '../../layouts/Base.astro';
+import { songs, detectSongLanguage } from '../../lib/songs';
+import { getRomanizedLyrics } from '../../lib/transliterate';
+
+export function getStaticPaths() {
+  return songs.map((song) => ({ params: { slug: song.slug }, props: { song } }));
+}
+
+const { song } = Astro.props;
+const langInfo = detectSongLanguage(song);
+
+const siteUrl = Astro.site ? Astro.site.href.replace(/\/$/, '') : 'https://keertana.vercel.app';
+const homeUrl = `${siteUrl}/`;
+const langUrl = `${siteUrl}/${langInfo.langId}/`;
+const letterUrl = `${siteUrl}/${langInfo.langId}/${encodeURIComponent(langInfo.firstChar)}/`;
+const canonical = `${siteUrl}/song/${song.slug}/`;
+
+const lyricLines = song.lyrics.split('\n').map((l) => l.trim()).filter(Boolean);
+const cleanSnippet = lyricLines.slice(0, 2).join(' ').slice(0, 140);
+const title = `${song.title} – ${langInfo.langLabel} Christian Song Lyrics | Keertana`;
+const description = `Read ${song.title}, a ${langInfo.langLabel} Christian worship song, on Keertana. ${cleanSnippet}`;
+
+const ogLocale = langInfo.langCode === 'te' ? 'te_IN' : langInfo.langCode === 'hi' ? 'hi_IN' : 'en_US';
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'MusicComposition',
+    name: song.title,
+    url: canonical,
+    '@id': `${canonical}#song`,
+    inLanguage: langInfo.langCode,
+    lyrics: { '@type': 'CreativeWork', text: song.lyrics, inLanguage: langInfo.langCode },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Keertana', item: homeUrl },
+      { '@type': 'ListItem', position: 2, name: `${langInfo.langLabel} Songs`, item: langUrl },
+      { '@type': 'ListItem', position: 3, name: `${langInfo.firstChar}`, item: letterUrl },
+      { '@type': 'ListItem', position: 4, name: song.title, item: canonical },
+    ],
+  },
+];
+
+const romanizedLyrics = getRomanizedLyrics(song.lyrics);
+---
+
+<Base
+  title={title}
+  description={description}
+  jsonLd={jsonLd}
+  lang={langInfo.langCode}
+  canonical={canonical}
+  ogType="music.song"
+  ogLocale={ogLocale}
+  songTitle={song.title}
+  songSlug={song.slug}
+>
+  <div class="container-page song-detail" style="max-width: 720px; margin-inline: auto; padding-top: 2.5rem; padding-bottom: 4rem;">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" style="margin-bottom: 1.75rem;">
+      <ol style="list-style: none; padding: 0; margin: 0; display: flex; align-items: center; gap: 0.375rem; font-size: 0.8125rem; color: var(--text-faint); flex-wrap: wrap;">
+        <li><a href="/" style="color: var(--text-muted); text-decoration: none; transition: color 0.15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">Keertana</a></li>
+        <li style="opacity: 0.5;">›</li>
+        <li><a href={`/${langInfo.langId}/`} style="color: var(--text-muted); text-decoration: none; transition: color 0.15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">{langInfo.langLabel}</a></li>
+        <li style="opacity: 0.5;">›</li>
+        <li><a href={`/${langInfo.langId}/${encodeURIComponent(langInfo.firstChar)}/`} style="color: var(--text-muted); text-decoration: none; transition: color 0.15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">{langInfo.firstChar}</a></li>
+        <li style="opacity: 0.5;">›</li>
+        <li aria-current="page" style="color: var(--text-faint);">{song.title}</li>
+      </ol>
+    </nav>
+
+    <!-- Song title header -->
+    <header style="margin-bottom: 2rem;">
+      <h1 class="reader-title" lang={langInfo.langCode} data-pagefind-meta="title" style="
+        color: var(--text);
+        margin: 0 0 1.25rem;
+      ">{song.title}</h1>
+
+      <!-- Toolbar: Font size controls + Copy + Share -->
+      <div class="song-toolbar" style="
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        padding: 0.625rem 0.875rem;
+        border-radius: 12px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+      ">
+        <!-- Font size controls -->
+        <div style="display: flex; align-items: center; gap: 0.375rem;" role="group" aria-label="Font size controls">
+          <span style="font-size: 0.8125rem; font-weight: 500; color: var(--text-muted); margin-right: 0.25rem;">Size:</span>
+          <button
+            id="font-dec-btn"
+            type="button"
+            aria-label="Decrease font size"
+            title="Decrease font size (A−)"
+            class="action-btn"
+          >
+            A−
+          </button>
+          <span id="font-size-label" style="font-size: 0.8125rem; font-weight: 600; color: var(--text); min-width: 2.25rem; text-align: center;">18px</span>
+          <button
+            id="font-inc-btn"
+            type="button"
+            aria-label="Increase font size"
+            title="Increase font size (A+)"
+            class="action-btn"
+          >
+            A+
+          </button>
+        </div>
+
+        <!-- Action buttons: Copy & Share -->
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <button id="save-song-btn" type="button" class="action-btn action-btn-text" data-song-slug={song.slug} aria-label="Save song" aria-pressed="false" disabled>
+            <span id="save-song-icon" aria-hidden="true">♡</span>
+            <span id="save-song-text">Save</span>
+          </button>
+          <button
+            id="copy-lyrics-btn"
+            type="button"
+            class="action-btn action-btn-text"
+            title="Copy song lyrics"
+            aria-label="Copy lyrics"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+            </svg>
+            <span id="copy-btn-text">Copy</span>
+          </button>
+
+          <button
+            id="share-btn"
+            type="button"
+            class="action-btn action-btn-text"
+            title="Share song"
+            aria-label="Share song"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/>
+            </svg>
+            <span id="share-btn-text">Share</span>
+          </button>
+        </div>
+      </div>
+      <p id="reader-status" role="status" aria-live="polite" class="reader-status"></p>
+      <a id="saved-songs-access" href="/#saved-songs" class="saved-songs-access" hidden>View Saved Songs →</a>
+    </header>
+
+    <!-- Lyrics Content Card -->
+    <article
+      data-pagefind-body
+      class="lyrics-card"
+      style="
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: clamp(1.5rem, 5vw, 2.75rem);
+        box-shadow: var(--shadow-sm);
+      "
+    >
+      <!-- Visible lyrics -->
+      <div
+        id="lyrics-body"
+        lang={langInfo.lyricsLang}
+      >{song.lyrics}</div>
+
+      <!-- Hidden romanized/phonetic text for Pagefind indexing so roman queries find Telugu lyrics -->
+      {romanizedLyrics && (
+        <div
+          class="sr-only"
+          aria-hidden="true"
+          style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;"
+        >
+          {romanizedLyrics}
+        </div>
+      )}
+    </article>
+
+    <!-- Bottom Navigation -->
+    <nav class="reader-bottom-nav" aria-label="More songs" style="margin-top: 2.5rem; display: flex; gap: 1.25rem; flex-wrap: wrap;">
+      <a
+        href={`/${langInfo.langId}/`}
+        style="
+          display: inline-flex;
+          align-items: center;
+          gap: 0.375rem;
+          font-size: 0.9375rem;
+          font-weight: 500;
+          color: var(--accent);
+          text-decoration: none;
+          transition: gap 0.15s;
+        "
+        onmouseover="this.style.gap='0.625rem'"
+        onmouseout="this.style.gap='0.375rem'"
+      >
+        <span>←</span>
+        <span>Back to {langInfo.langLabel} songs</span>
+      </a>
+      <a
+        href={`/${langInfo.langId}/${encodeURIComponent(langInfo.firstChar)}/`}
+        style="
+          display: inline-flex;
+          align-items: center;
+          gap: 0.375rem;
+          font-size: 0.9375rem;
+          font-weight: 500;
+          color: var(--text-muted);
+          text-decoration: none;
+          transition: color 0.15s;
+        "
+        onmouseover="this.style.color='var(--accent)'"
+        onmouseout="this.style.color='var(--text-muted)'"
+      >
+        <span>More songs starting with '{langInfo.firstChar}' →</span>
+      </a>
+    </nav>
+
+  </div>
+</Base>
+
+<style>
+  .reader-status { min-height: 1.5em; margin: 0.375rem 0 0; color: var(--text-muted); font-size: 0.8125rem; }
+  .saved-songs-access { display: inline-block; padding: 0.5rem 0; font-size: 0.8125rem; color: var(--accent); }
+  .saved-songs-access[hidden] { display: none; }
+  #save-song-btn[aria-pressed="true"] { color: var(--accent); border-color: var(--border); }
+  #save-song-icon { font-size: 1.125rem; line-height: 1; }
+  .reader-bottom-nav { padding-top: 1rem; border-top: 1px solid var(--border-subtle); }
+  .reader-bottom-nav a { min-height: 44px; padding-block: 0.5rem; }
+  @media (max-width: 480px) {
+    .song-toolbar > div { width: 100%; }
+    .song-toolbar > div:last-child { justify-content: flex-start; flex-wrap: wrap; }
+    .reader-bottom-nav { flex-direction: column; gap: 0.375rem !important; }
+  }
+  .reader-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 4.5vw, 2.5rem);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.025em;
+    overflow-wrap: anywhere;
+  }
+  .reader-title:lang(te), .reader-title:lang(hi) {
+    letter-spacing: normal;
+    line-height: 1.45;
+  }
+  #lyrics-body {
+    --reader-default-font-size: 18px;
+    font-family: var(--font-sans);
+    font-size: var(--lyrics-font-size, var(--reader-default-font-size));
+    font-weight: 400;
+    line-height: 1.85;
+    letter-spacing: normal;
+    white-space: pre-wrap;
+    color: var(--text);
+    overflow-wrap: break-word;
+  }
+  #lyrics-body:lang(te) { line-height: 1.95; }
+  #lyrics-body:lang(hi) { line-height: 1.9; }
+  @media (min-width: 768px) {
+    #lyrics-body { --reader-default-font-size: 20px; }
+  }
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    padding: 0 0.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+  .action-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-bg);
+  }
+  .action-btn:active {
+    transform: scale(0.96);
+  }
+  .action-btn:disabled { opacity: 0.4; cursor: default; }
+  .action-btn-text {
+    gap: 0.375rem;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+</style>
+
+<script>
+  import { readLibrary, updateLibrary, LIBRARY_KEY } from '../../../public/local-library.js';
+  const saveButton = document.getElementById('save-song-btn') as HTMLButtonElement;
+  const slug = saveButton.dataset.songSlug!;
+  const status = document.getElementById('reader-status')!;
+  function syncSaved() {
+    try {
+      const library = readLibrary(localStorage);
+      const saved = library.saved.includes(slug);
+      saveButton.setAttribute('aria-pressed', String(saved));
+      saveButton.setAttribute('aria-label', saved ? 'Remove song from Saved Songs' : 'Save song');
+      document.getElementById('save-song-icon')!.textContent = saved ? '♥' : '♡';
+      document.getElementById('save-song-text')!.textContent = saved ? 'Saved' : 'Save';
+      document.getElementById('saved-songs-access')!.hidden = library.saved.length === 0;
+    } catch { /* Reading remains available when browser storage is blocked. */ }
+  }
+  function recordView() {
+    try { updateLibrary(localStorage, 'view', slug); } catch { /* History is optional. */ }
+    syncSaved();
+  }
+  saveButton.disabled = false;
+  recordView();
+  window.addEventListener('pageshow', recordView);
+  window.addEventListener('storage', event => { if (event.key === LIBRARY_KEY || event.key === null) syncSaved(); });
+  saveButton.addEventListener('click', () => {
+    try {
+      const saved = readLibrary(localStorage).saved.includes(slug);
+      updateLibrary(localStorage, saved ? 'remove' : 'save', slug);
+      syncSaved();
+      status.textContent = saved ? 'Removed from Saved Songs.' : 'Saved in this browser.';
+    } catch { status.textContent = 'Saving is unavailable in this browser. Please allow local storage and try again.'; }
+  });
+</script>
+
+<script define:vars={{ lyricsText: song.lyrics, songTitle: song.title }}>
+  // ─── Font Size Controls ─────────────────────────────────────────────
+  const MIN_SIZE = 16;
+  const MAX_SIZE = 40;
+  const STEP = 2;
+  const lyricsBody = document.getElementById('lyrics-body');
+
+  const decBtn = document.getElementById('font-dec-btn');
+  const incBtn = document.getElementById('font-inc-btn');
+  const labelEl = document.getElementById('font-size-label');
+  const readerStatus = document.getElementById('reader-status');
+  let memorySize = null;
+
+  function getCurrentSize() {
+    let saved = memorySize;
+    try { saved = localStorage.getItem('keertana-font-size') || saved; } catch {}
+    const DEFAULT_SIZE = lyricsBody ? parseFloat(getComputedStyle(lyricsBody).getPropertyValue('--reader-default-font-size')) : 18;
+    const val = saved ? parseInt(saved, 10) : DEFAULT_SIZE;
+    return isNaN(val) ? DEFAULT_SIZE : Math.max(MIN_SIZE, Math.min(MAX_SIZE, val));
+  }
+
+  function setFontSize(size) {
+    const clamped = Math.max(MIN_SIZE, Math.min(MAX_SIZE, size));
+    document.documentElement.style.setProperty('--lyrics-font-size', clamped + 'px');
+    memorySize = clamped.toString();
+    try { localStorage.setItem('keertana-font-size', memorySize); } catch {}
+    if (labelEl) labelEl.textContent = clamped + 'px';
+    updateSizeButtons(clamped);
+  }
+  function updateSizeButtons(size) {
+    if (decBtn) decBtn.disabled = size <= MIN_SIZE;
+    if (incBtn) incBtn.disabled = size >= MAX_SIZE;
+  }
+
+  // Init label
+  const initial = getCurrentSize();
+  if (labelEl) labelEl.textContent = initial + 'px';
+  document.documentElement.style.setProperty('--lyrics-font-size', initial + 'px');
+  updateSizeButtons(initial);
+  window.matchMedia('(min-width: 768px)').addEventListener('change', () => {
+    const size = getCurrentSize();
+    document.documentElement.style.setProperty('--lyrics-font-size', size + 'px');
+    if (labelEl) labelEl.textContent = size + 'px';
+    updateSizeButtons(size);
+  });
+
+  decBtn?.addEventListener('click', () => {
+    const curr = getCurrentSize();
+    setFontSize(curr - STEP);
+  });
+
+  incBtn?.addEventListener('click', () => {
+    const curr = getCurrentSize();
+    setFontSize(curr + STEP);
+  });
+
+  // ─── Copy Lyrics ────────────────────────────────────────────────────
+  const copyBtn = document.getElementById('copy-lyrics-btn');
+  const copyText = document.getElementById('copy-btn-text');
+
+  copyBtn?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(lyricsText);
+      if (copyText) copyText.textContent = 'Copied!';
+      if (readerStatus) readerStatus.textContent = 'Lyrics copied.';
+      copyBtn.style.borderColor = 'var(--accent)';
+      copyBtn.style.color = 'var(--accent)';
+      setTimeout(() => {
+        if (copyText) copyText.textContent = 'Copy';
+        copyBtn.style.borderColor = '';
+        copyBtn.style.color = '';
+      }, 2000);
+    } catch (e) {
+      if (copyText) copyText.textContent = 'Failed';
+      if (readerStatus) readerStatus.textContent = 'Could not copy lyrics. You can select and copy the text below.';
+      setTimeout(() => {
+        if (copyText) copyText.textContent = 'Copy';
+      }, 2000);
+    }
+  });
+
+  // ─── Share ──────────────────────────────────────────────────────────
+  const shareBtn = document.getElementById('share-btn');
+  const shareText = document.getElementById('share-btn-text');
+
+  shareBtn?.addEventListener('click', async () => {
+    const shareData = {
+      title: `${songTitle} – Keertana`,
+      text: `Read lyrics for "${songTitle}" on Keertana:`,
+      url: window.location.href,
+    };
+
+    if (navigator.share && (!navigator.canShare || navigator.canShare(shareData))) {
+      try {
+        await navigator.share(shareData);
+        if (readerStatus) readerStatus.textContent = 'Song shared.';
+      } catch (err) {
+        if (err.name !== 'AbortError') copyShareLink();
+      }
+    } else {
+      copyShareLink();
+    }
+  });
+
+  async function copyShareLink() {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      if (shareText) shareText.textContent = 'Link copied!';
+      if (readerStatus) readerStatus.textContent = 'Song link copied.';
+      shareBtn.style.borderColor = 'var(--accent)';
+      shareBtn.style.color = 'var(--accent)';
+      setTimeout(() => {
+        if (shareText) shareText.textContent = 'Share';
+        shareBtn.style.borderColor = '';
+        shareBtn.style.color = '';
+      }, 2000);
+    } catch {
+      if (shareText) shareText.textContent = 'Failed';
+      if (readerStatus) readerStatus.textContent = 'Could not copy the link. You can copy the song address from your browser.';
+      setTimeout(() => {
+        if (shareText) shareText.textContent = 'Share';
+      }, 2000);
+    }
+  }
+</script>

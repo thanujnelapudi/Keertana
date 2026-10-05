@@ -1,0 +1,41 @@
+.contribution-page { max-width: 760px; margin-inline: auto; padding-block: 2.5rem 2rem; }
+.contribution-breadcrumb { display: flex; flex-wrap: wrap; gap: .65rem; align-items: center; font-size: .8125rem; color: var(--text-muted); margin-bottom: 2rem; }
+.contribution-breadcrumb a { display: inline-flex; align-items: center; min-height: 44px; }
+.contribution-intro { margin-bottom: 2rem; }
+.contribution-intro h1 { font-size: clamp(1.875rem, 5vw, 2.5rem); line-height: 1.25; letter-spacing: -.025em; font-weight: 700; margin: 0 0 .75rem; }
+.contribution-intro p { color: var(--text-muted); max-width: 40rem; margin: 0; }
+.contribution-options { border-top: 1px solid var(--border); }
+.contribution-option { padding: 1.5rem 0; border-bottom: 1px solid var(--border); }
+.contribution-option h2 { font-size: 1.25rem; font-weight: 600; margin: 0 0 .4rem; }
+.contribution-option p { color: var(--text-muted); margin: 0 0 .5rem; }
+.contribution-link { color: var(--accent); display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; text-underline-offset: 4px; }
+.contribution-link:hover, .contribution-breadcrumb a:hover { color: var(--accent-hover); }
+.contribution-notice { border-left: 3px solid var(--accent); background: var(--surface-subtle); padding: 1rem 1.125rem; margin: 0 0 1.75rem; color: var(--text-muted); font-size: .875rem; }
+.contribution-notice strong { color: var(--text); font-weight: 600; }
+.contribution-form { display: grid; gap: 1.5rem; }
+.contribution-form [hidden] { display: none !important; }
+.contribution-required-note, .contribution-help { font-size: .8125rem; color: var(--text-muted); margin: .4rem 0 0; }
+.contribution-required-note { margin: 0; }
+.contribution-field { min-width: 0; }
+.contribution-field > label, .contribution-form legend { display: block; font-weight: 600; margin: 0 0 .5rem; }
+.contribution-optional { font-size: .8125rem; color: var(--text-muted); font-weight: 400; }
+.contribution-field input:not([type=checkbox]), .contribution-field select, .contribution-field textarea { width: 100%; min-height: 48px; padding: .7rem .875rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); font: inherit; font-size: 1rem; line-height: 1.6; }
+.contribution-field textarea { resize: vertical; min-height: 140px; }
+.contribution-field textarea[name=lyrics] { min-height: 300px; }
+.contribution-field [aria-invalid=true] { border-color: var(--accent); }
+.contribution-error { color: var(--accent); font-size: .875rem; margin: .4rem 0 0; }
+.contribution-form fieldset { padding: 0; border: 0; min-width: 0; }
+.contribution-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .25rem 1rem; }
+.contribution-check { display: flex; align-items: flex-start; gap: .75rem; padding-block: .6rem; min-height: 44px; font-size: .9375rem; cursor: pointer; }
+.contribution-check input { flex: 0 0 auto; width: 20px; height: 20px; margin-top: .2rem; accent-color: var(--accent); }
+.contribution-details { border-block: 1px solid var(--border); padding-block: .75rem; }
+.contribution-details summary { cursor: pointer; min-height: 44px; padding-block: .6rem; font-weight: 600; }
+.contribution-details-body { display: grid; gap: 1.5rem; padding-block: 1rem; }
+.contribution-button { justify-self: start; min-height: 48px; border: 1px solid var(--accent); border-radius: 10px; background: var(--accent); color: var(--on-accent); padding: .7rem 1.25rem; font: inherit; font-weight: 600; cursor: pointer; }
+.contribution-button:hover { background: var(--accent-hover); }
+.contribution-button:disabled { opacity: .6; cursor: wait; }
+.contribution-status { border-left: 3px solid var(--accent); background: var(--surface-subtle); padding: 1rem; margin: 0; overflow-wrap: anywhere; }
+.contribution-related { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: .875rem; color: var(--text-muted); }
+.contribution-context { margin: .75rem 0 0; font-size: .875rem; color: var(--text-muted); overflow-wrap: anywhere; }
+.contribution-page :is(input, select, textarea, button, summary, a):focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+@media (max-width: 480px) { .contribution-page { padding-top: 1.5rem; } .contribution-choices { grid-template-columns: 1fr; } .contribution-button { width: 100%; } }

@@ -1,0 +1,926 @@
+---
+import SongRow from '../components/SongRow.astro';
+import BrowseEnhancements from '../components/BrowseEnhancements.astro';
+import Base from '../layouts/Base.astro';
+import { getLanguagesData, type LangData } from '../lib/songs';
+import LocalLibrary from '../components/LocalLibrary.astro';
+
+const languages: LangData[] = getLanguagesData();
+const defaultLang = languages[0]; // Telugu
+
+const siteUrl = Astro.site ? Astro.site.href.replace(/\/$/, '') : 'https://keertana.vercel.app';
+const canonical = `${siteUrl}/`;
+
+const title = 'Christian Worship Songs & Lyrics | Keertana';
+const description = 'Keertana is a multilingual library of Christian worship songs, hymns, and praise lyrics in Telugu, Hindi, and English. Search titles or browse alphabetically.';
+
+const PER_PAGE = 24;
+const initialSongs = defaultLang.songs.slice(0, PER_PAGE);
+const totalPages = Math.ceil(defaultLang.songs.length / PER_PAGE);
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Keertana',
+    url: canonical,
+    description,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Telugu worship songs',
+    numberOfItems: initialSongs.length,
+    itemListElement: initialSongs.map((s, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: s.title,
+      url: `${siteUrl}/song/${s.slug}/`,
+    })),
+  },
+];
+
+const songsPayload = Object.fromEntries(
+  languages.map((lang) => [
+    lang.id,
+    lang.songs.map((s) => ({ slug: s.slug, title: s.title })),
+  ])
+);
+
+const SONGS_JSON = JSON.stringify(songsPayload);
+const LANGS_JSON = JSON.stringify(
+  languages.map((l) => ({
+    id: l.id,
+    label: l.label,
+    locale: l.locale,
+    allLetters: l.allLetters,
+    letters: l.letters,
+    totalSongs: l.songs.length,
+  }))
+);
+---
+
+<Base
+  title={title}
+  description={description}
+  jsonLd={jsonLd}
+  canonical={canonical}
+  lang="en"
+>
+  <!-- ══════════════════════════════════════════════════════════════════
+       HERO & SEARCH
+  ══════════════════════════════════════════════════════════════════ -->
+  <section class="hero-section library-hero" style="
+    padding-top: 5rem;
+    padding-bottom: 4rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  ">
+    <div class="container-page" style="max-width: 720px; margin-inline: auto;">
+      <h1 style="
+        font-size: clamp(2.5rem, 7vw, 4.5rem);
+        font-weight: 700;
+        letter-spacing: -0.035em;
+        line-height: 1.1;
+        color: var(--text);
+        margin: 0 0 1rem;
+      ">
+        Find your song or hymn
+      </h1>
+      <p style="
+        font-size: clamp(1rem, 2.5vw, 1.125rem);
+        color: var(--text-muted);
+        line-height: 1.6;
+        max-width: 440px;
+        margin: 0 auto 2rem;
+      ">
+        Discover Christian worship songs and hymns in Telugu, Hindi, and English. Find the words, sing your praise, and worship God.
+      </p>
+
+      <!-- Search Wrapper -->
+      <div id="search" style="
+        max-width: 580px;
+        margin-inline: auto;
+        position: relative;
+        text-align: left;
+      ">
+        <!-- Title | Lyrics Toggle -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.625rem; padding-inline: 0.25rem;">
+          <span id="search-hint" style="font-size: 0.75rem; color: var(--text-faint);">
+            Type in Telugu, Hindi or Roman (e.g. yesayya)
+          </span>
+        </div>
+
+        <!-- Combobox Input Container -->
+        <div style="position: relative;">
+          <label for="search-input" class="sr-only" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0);">Search songs</label>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="position: absolute; left: 1.125rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; z-index: 2;"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+
+          <input
+            id="search-input"
+            type="search"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-haspopup="listbox"
+            aria-controls="search-suggestions-list"
+            aria-describedby="search-hint"
+            placeholder="Search song titles (e.g. yesayya, స్తుతి)…"
+            autocomplete="off"
+            spellcheck="false"
+            style="
+              width: 100%;
+              height: 3.5rem;
+              padding: 0 3.25rem 0 3.25rem;
+              border-radius: 14px;
+              border: 1.5px solid var(--border);
+              background: var(--surface);
+              color: var(--text);
+              font-size: 1.0625rem;
+              font-family: inherit;
+              outline: none;
+              transition: border-color 0.15s, box-shadow 0.15s;
+              box-shadow: var(--shadow-sm);
+            "
+          />
+
+          <button
+            id="search-clear"
+            type="button"
+            title="Clear search"
+            aria-label="Clear search"
+            style="
+              display: none;
+              position: absolute;
+              right: 0.875rem;
+              top: 50%;
+              transform: translateY(-50%);
+              width: 2rem;
+              height: 2rem;
+              border-radius: 50%;
+              border: none;
+              background: var(--surface-subtle);
+              color: var(--text-muted);
+              cursor: pointer;
+              align-items: center;
+              justify-content: center;
+              font-size: 1.125rem;
+              line-height: 1;
+              z-index: 2;
+            "
+          >×</button>
+        </div>
+
+        <!-- Live Suggestions Dropdown (ARIA Listbox) -->
+        <div
+          id="search-dropdown"
+          style="
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: var(--shadow-md);
+            z-index: 100;
+            overflow: hidden;
+            max-height: 480px;
+            overflow-y: auto;
+          "
+        >
+          <ul
+            id="search-suggestions-list"
+            role="listbox"
+            aria-label="Search suggestions"
+            style="list-style: none; margin: 0; padding: 0.375rem;"
+          >
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="container-page browse-shortcuts"><a href="#browse-filters">Browse songs ↓</a><a id="library-shortcut" href="#local-library" hidden>Your Library</a></div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       BROWSE SONGS
+  ══════════════════════════════════════════════════════════════════ -->
+  <section id="browse" class="browse-section" style="padding-top: 3.5rem; padding-bottom: 5rem;">
+    <div class="container-page">
+
+      <LocalLibrary />
+      <h2 style="
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+        margin: 0 0 1.5rem;
+      ">Browse Songs</h2>
+
+      <div id="browse-filters"></div>
+      <!-- Language tabs -->
+      <div id="lang-tabs" role="tablist" aria-label="Select language" style="
+        display: flex;
+        gap: 0;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 1.75rem;
+        overflow-x: auto;
+        scrollbar-width: none;
+      ">
+        {languages.map((lang, index) => (
+          <a
+            href={`/${lang.id}/`}
+            role="tab"
+            data-lang={lang.id}
+            class="lang-tab"
+            id={`lang-tab-${lang.id}`}
+            aria-controls="song-list"
+            aria-selected={index === 0 ? 'true' : 'false'}
+            style="
+              padding: 0.625rem 1.25rem;
+              font-size: 0.9375rem;
+              font-weight: 600;
+              color: var(--text-muted);
+              background: none;
+              border: none;
+              border-bottom: 2px solid transparent;
+              margin-bottom: -1px;
+              cursor: pointer;
+              white-space: nowrap;
+              text-decoration: none;
+              transition: color 0.15s, border-color 0.15s;
+              font-family: inherit;
+            "
+          >
+            {lang.label}
+          </a>
+        ))}
+      </div>
+
+      <!-- Letter filter grid with "All" and dimmed 0-count letters -->
+      <div id="alpha-container" style="margin-bottom: 2.25rem;">
+        <div class="alpha-grid" role="group" aria-label="Alphabet filter">
+          <a
+            href="/telugu/"
+            class="alpha-btn active"
+            data-slug=""
+            title="All songs"
+          >
+            All
+          </a>
+          {defaultLang.allLetters.filter(lt => lt.count > 0).map((lt) =>
+            lt.count > 0 ? (
+              <a
+                href={`/telugu/${encodeURIComponent(lt.char)}/`}
+                class="alpha-btn"
+                data-char={lt.char}
+                title={`${lt.char} · ${lt.count} songs`}
+              >
+                {lt.char}
+              </a>
+            ) : null
+          )}
+        </div>
+      </div>
+
+      <!-- Song list heading -->
+      <div style="
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border);
+      ">
+        <h3 id="current-filter-heading" style="
+          font-size: 0.8125rem;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--text-muted);
+          margin: 0;
+        ">
+          All Telugu Songs
+        </h3>
+        <span id="song-count-badge" role="status" aria-live="polite" style="font-size: 0.8125rem; color: var(--text-faint);">
+          Showing 1–{initialSongs.length} of {defaultLang.songs.length}
+        </span>
+      </div>
+
+      <!-- Empty / No results message -->
+      <p id="no-results" style="
+        display: none;
+        text-align: center;
+        padding: 3rem 0;
+        color: var(--text-muted);
+        font-size: 1rem;
+      ">No songs match this selection.<br/><button id="reset-browse" type="button">Show all songs in this language</button></p>
+
+      <!-- Song list grid -->
+      <div id="song-list" role="tabpanel" aria-labelledby={`lang-tab-${defaultLang.id}`} data-language={defaultLang.label} data-locale={defaultLang.locale} style="
+        display: grid;
+        grid-template-columns: 1fr;
+      ">
+        {initialSongs.map((s) => (
+          <SongRow song={s} label={defaultLang.label} locale={defaultLang.locale} />
+        ))}
+      </div>
+
+      <!-- Progressive enhancement "Load more" button -->
+      <div id="load-more-container" style={`margin-top: 3rem; text-align: center; display: ${totalPages > 1 ? 'block' : 'none'};`}>
+        <a
+          id="load-more-btn"
+          href="/telugu/page/2/"
+          class="load-more-button"
+        >
+          Load more songs
+        </a>
+        <noscript>
+          <div style="margin-top: 1rem;">
+            <a href="/telugu/page/2/" style="color: var(--accent); font-weight: 500; font-size: 0.9375rem;">Next page (2 of {totalPages}) →</a>
+          </div>
+        </noscript>
+      </div>
+
+    </div>
+  </section>
+  <BrowseEnhancements />
+</Base>
+
+<style>
+  .browse-section:has(#local-library:not([hidden])) { padding-top: 2rem !important; }
+  .search-mode-tabs {
+    display: inline-flex;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2px;
+  }
+  .mode-btn {
+    border: none;
+    background: transparent;
+    padding: 0.3rem 0.875rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .mode-btn.active {
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 600;
+  }
+
+  .lang-tab[aria-selected="true"] {
+    color: var(--accent) !important;
+    border-bottom-color: var(--accent) !important;
+  }
+  .lang-tab:hover {
+    color: var(--accent);
+  }
+
+  .alpha-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  :global(.alpha-btn) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding: 0 0.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  :global(.alpha-btn:hover:not(.alpha-btn-disabled)) {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-bg);
+  }
+
+  :global(.alpha-btn.active) {
+    background: var(--accent) !important;
+    color: var(--on-accent) !important;
+    border-color: var(--accent) !important;
+    font-weight: 700;
+  }
+
+  :global(.alpha-btn-disabled) {
+    opacity: 0.35;
+    cursor: not-allowed;
+    background: transparent;
+    border-color: var(--border-subtle);
+    color: var(--text-faint);
+  }
+
+  :global(.song-row) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 0.25rem;
+    min-height: 3.5rem;
+    border-bottom: 1px solid var(--border-subtle);
+    text-decoration: none;
+    color: var(--text);
+    transition: background 0.1s, padding-left 0.1s;
+    gap: 1rem;
+    border-radius: 0;
+  }
+  :global(.song-row:hover) {
+    background: var(--surface);
+    padding-left: 0.75rem;
+    color: var(--accent);
+  }
+  :global(.song-row:hover .song-arrow) {
+    color: var(--accent);
+    transform: translateX(2px);
+  }
+  :global(.song-title) {
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.5;
+    flex: 1;
+    min-width: 0;
+  }
+  :global(.song-arrow) {
+    color: var(--text-muted);
+    opacity: 1;
+    flex-shrink: 0;
+    font-size: 1rem;
+    transition: color 0.15s, transform 0.15s;
+  }
+
+  .load-more-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 2rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.15s ease;
+  }
+  .load-more-button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-bg);
+  }
+
+  /* Suggestion Item in dropdown */
+  .suggestion-item {
+    display: block;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .suggestion-item:hover,
+  .suggestion-item.active-option {
+    background: var(--accent-bg);
+    color: var(--accent);
+  }
+  .suggestion-title {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .suggestion-badge {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    background: var(--surface-subtle);
+    color: var(--text-muted);
+    margin-left: 0.5rem;
+  }
+  .suggestion-excerpt {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+    line-height: 1.4;
+  }
+  .suggestion-excerpt mark {
+    background: color-mix(in srgb, var(--accent) 25%, transparent);
+    color: var(--text);
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+
+  @media (min-width: 768px) {
+    #song-list {
+      grid-template-columns: 1fr 1fr !important;
+      column-gap: 2.5rem !important;
+    }
+  }
+</style>
+
+<script define:vars={{ SONGS_JSON, LANGS_JSON }}>
+  // ─── Data & State ──────────────────────────────────────────────────
+  const allSongs = JSON.parse(SONGS_JSON);
+  const languages = JSON.parse(LANGS_JSON);
+
+  const PER_PAGE = 24;
+  let activeLang = 'telugu';
+  let activeLetter = '';
+  let loadedCount = PER_PAGE;
+
+  let searchIndex = null;
+  let searchTimer = null;
+  let activeOptionIndex = -1;
+  let currentSuggestions = [];
+
+  // ─── DOM References ────────────────────────────────────────────────
+  const searchInput = document.getElementById('search-input');
+  const searchClear = document.getElementById('search-clear');
+  const searchDropdown = document.getElementById('search-dropdown');
+  const suggestionsList = document.getElementById('search-suggestions-list');
+  const searchHint = document.getElementById('search-hint');
+
+
+  const langTabs = document.getElementById('lang-tabs');
+  const alphaContainer = document.getElementById('alpha-container');
+  const songList = document.getElementById('song-list');
+  const loadMoreBtn = document.getElementById('load-more-btn');
+  const loadMoreContainer = document.getElementById('load-more-container');
+  const songCountBadge = document.getElementById('song-count-badge');
+  const filterHeading = document.getElementById('current-filter-heading');
+  const noResults = document.getElementById('no-results');
+
+  const titleMatcher = import('/title-search.js');
+  // ─── Lazy Load Search Index ────────────────────────────────────────
+  async function loadSearchIndex() {
+    if (searchIndex) return searchIndex;
+    try {
+      const res = await fetch('/api/search-index.json?v=title-roman-2', { cache: 'no-store' });
+      if (res.ok) {
+        searchIndex = await res.json();
+      }
+    } catch (e) {
+      console.warn('Failed to load search index:', e);
+    }
+    return searchIndex;
+  }
+
+  // Trigger lazy load on first interaction
+  searchInput?.addEventListener('focus', () => {
+    loadSearchIndex();
+    searchInput.style.borderColor = 'var(--accent)';
+    searchInput.style.boxShadow = '0 0 0 3px var(--accent-bg)';
+  });
+  searchInput?.addEventListener('blur', () => {
+    searchInput.style.borderColor = 'var(--border)';
+    searchInput.style.boxShadow = 'var(--shadow-sm)';
+  });
+
+  // ─── Search Execution ──────────────────────────────────────────────
+  function triggerSearch() {
+    clearTimeout(searchTimer);
+    const q = searchInput.value.trim();
+    if (!q) {
+      closeDropdown();
+      searchClear.style.display = 'none';
+      return;
+    }
+    searchClear.style.display = 'flex';
+    activeOptionIndex = -1;
+    searchInput.removeAttribute('aria-activedescendant');
+    suggestionsList.textContent = 'Searching titles…';
+    openDropdown();
+    searchTimer = setTimeout(() => {
+      performTitleSearch(q);
+    }, 150);
+  }
+
+  searchInput?.addEventListener('input', triggerSearch);
+
+  searchClear?.addEventListener('click', () => {
+    clearTimeout(searchTimer);
+    searchInput.value = '';
+    searchClear.style.display = 'none';
+    closeDropdown();
+    searchInput.focus();
+  });
+
+  // ─── Title Search with Transliteration ─────────────────────────────
+  async function performTitleSearch(query) {
+    const index = await loadSearchIndex();
+    if (!index) {
+      if (searchInput.value.trim() !== query) return;
+      suggestionsList.textContent = 'Search could not load. Please try again.';
+      openDropdown();
+      return;
+    }
+
+    if (searchInput.value.trim() !== query) return;
+    const { searchTitles } = await titleMatcher;
+    if (searchInput.value.trim() !== query) return;
+    const topMatches = searchTitles(index, query);
+    renderTitleSuggestions(topMatches, query);
+  }
+
+  function renderTitleSuggestions(matches, query) {
+    currentSuggestions = matches.map(m => `/song/${encodeURIComponent(m.s)}/`);
+    activeOptionIndex = -1;
+
+    if (matches.length === 0) {
+      suggestionsList.innerHTML = `
+        <li style="padding: 1.25rem 1rem; text-align: center; color: var(--text-muted); font-size: 0.9375rem;">
+          No songs found matching "<strong>${escapeHtml(query)}</strong>".<br/>
+          <span style="font-size: 0.8125rem; color: var(--text-faint);">Try a shorter title or a different Roman spelling.</span>
+        </li>
+      `;
+      openDropdown();
+      return;
+    }
+
+    let html = '';
+    matches.forEach((m, idx) => {
+      const langLabel = m.g === 'telugu' ? 'Telugu' : m.g === 'hindi' ? 'Hindi' : 'English';
+      html += `
+        <li role="option" id="suggestion-${idx}" class="suggestion-li">
+          <a href="/song/${encodeURIComponent(m.s)}/" class="suggestion-item" data-index="${idx}">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span class="suggestion-title">${escapeHtml(m.t)}</span>
+              <span class="suggestion-badge">${langLabel}</span>
+            </div>
+          </a>
+        </li>
+      `;
+    });
+    suggestionsList.innerHTML = html;
+    openDropdown();
+  }
+
+  // ─── Dropdown Control ──────────────────────────────────────────────
+  function openDropdown() {
+    searchDropdown.style.display = 'block';
+    searchInput.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeDropdown() {
+    searchDropdown.style.display = 'none';
+    searchInput.setAttribute('aria-expanded', 'false');
+    searchInput.removeAttribute('aria-activedescendant');
+    activeOptionIndex = -1;
+  }
+
+  // Close on click outside
+  document.addEventListener('click', (e) => {
+    if (!document.getElementById('search')?.contains(e.target)) {
+      closeDropdown();
+    }
+  });
+
+  // ─── Keyboard Navigation (ARIA Combobox) ───────────────────────────
+  searchInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeDropdown(); return; }
+    const items = suggestionsList.querySelectorAll('.suggestion-item');
+    if (!items.length || searchDropdown.style.display === 'none') {
+      if (e.key === 'ArrowDown' && searchInput.value.trim()) {
+        triggerSearch();
+      }
+      return;
+    }
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeOptionIndex = (activeOptionIndex + 1) % items.length;
+      updateActiveOption(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeOptionIndex = (activeOptionIndex - 1 + items.length) % items.length;
+      updateActiveOption(items);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (activeOptionIndex >= 0 && activeOptionIndex < items.length) {
+        items[activeOptionIndex].click();
+      } else if (items.length > 0) {
+        items[0].click();
+      }
+    } else if (e.key === 'Escape') {
+      closeDropdown();
+    }
+  });
+
+  function updateActiveOption(items) {
+    items.forEach((item, i) => {
+      if (i === activeOptionIndex) {
+        item.classList.add('active-option');
+        item.parentElement.setAttribute('aria-selected', 'true');
+        item.scrollIntoView({ block: 'nearest' });
+        searchInput.setAttribute('aria-activedescendant', `suggestion-${i}`);
+      } else {
+        item.classList.remove('active-option');
+        item.parentElement.setAttribute('aria-selected', 'false');
+      }
+    });
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // ─── Alphabet Grid and Language Browsing ───────────────────────────
+  function getCurrentLangData() {
+    return languages.find(l => l.id === activeLang) || languages[0];
+  }
+
+  function getFilteredSongs() {
+    const langSongs = allSongs[activeLang] || [];
+    if (!activeLetter) return langSongs;
+
+    return langSongs.filter(s => {
+      let ch = Array.from(s.title)[0] ?? '';
+      if (activeLang === 'english') {
+        ch = ch.toUpperCase();
+        if (!/^[A-Z]$/.test(ch)) ch = '#';
+      }
+      return ch === activeLetter;
+    });
+  }
+
+  function renderSongList() {
+    const filtered = getFilteredSongs();
+    songList.dataset.language = getCurrentLangData().label;
+    songList.dataset.locale = getCurrentLangData().locale;
+    songList.setAttribute('aria-labelledby', `lang-tab-${activeLang}`);
+    const total = filtered.length;
+    const pageSongs = filtered.slice(0, loadedCount);
+
+    if (total === 0) {
+      songList.innerHTML = '';
+      noResults.style.display = 'block';
+      loadMoreContainer.style.display = 'none';
+      songCountBadge.textContent = '0 songs';
+      return;
+    }
+
+    noResults.style.display = 'none';
+    const fragment = document.createDocumentFragment();
+    for (const song of pageSongs) {
+      const a = document.createElement('a');
+      a.href = `/song/${encodeURIComponent(song.slug)}/`;
+      a.className = 'song-row';
+      a.innerHTML = `<span class="song-title">${escapeHtml(song.title)}</span><span class="song-arrow" aria-hidden="true">→</span>`;
+      fragment.appendChild(a);
+    }
+    songList.replaceChildren(fragment);
+
+    songCountBadge.textContent = `Showing 1–${Math.min(pageSongs.length, total)} of ${total}`;
+
+    if (loadedCount >= total) {
+      loadMoreContainer.style.display = 'none';
+    } else {
+      loadMoreContainer.style.display = 'block';
+      const nextPage = Math.floor(loadedCount / PER_PAGE) + 1;
+      loadMoreBtn.setAttribute('href', `/${activeLang}/page/${nextPage}/`);
+    }
+  }
+
+  function renderAlphabetGrid() {
+    const langData = getCurrentLangData();
+    let html = `
+      <a href="/${langData.id}/" class="alpha-btn ${!activeLetter ? 'active' : ''}" data-char="" title="All songs">
+        All
+      </a>
+    `;
+
+    for (const lt of langData.allLetters.filter(letter => letter.count > 0)) {
+      const isActive = lt.char === activeLetter;
+      if (lt.count > 0) {
+        html += `
+          <a href="/${langData.id}/${encodeURIComponent(lt.char)}/" class="alpha-btn ${isActive ? 'active' : ''}" data-char="${escapeHtml(lt.char)}" title="${escapeHtml(lt.char)} · ${lt.count} songs">
+            ${escapeHtml(lt.char)}
+          </a>
+        `;
+      }
+    }
+
+    alphaContainer.querySelector('.alpha-grid').innerHTML = html;
+    attachAlphaListeners();
+  }
+
+  function attachAlphaListeners() {
+    alphaContainer.querySelectorAll('.alpha-btn:not(.alpha-btn-disabled)').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
+          e.preventDefault();
+          const ch = btn.getAttribute('data-char') || '';
+          activeLetter = ch;
+          loadedCount = PER_PAGE;
+
+          const langData = getCurrentLangData();
+          filterHeading.textContent = activeLetter
+            ? `${langData.label} Songs starting with '${activeLetter}'`
+            : `All ${langData.label} Songs`;
+
+          renderAlphabetGrid();
+          renderSongList();
+          alphaContainer.querySelector('.alpha-btn.active')?.focus({ preventScroll: true });
+        }
+      });
+    });
+  }
+
+  // ─── Language Tab Switching ────────────────────────────────────────
+  langTabs.querySelectorAll('.lang-tab').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
+        e.preventDefault();
+        const langId = tab.getAttribute('data-lang');
+        if (langId !== activeLang) {
+          activeLang = langId;
+          activeLetter = '';
+          loadedCount = PER_PAGE;
+
+          langTabs.querySelectorAll('.lang-tab').forEach(t => {
+            const selected = t.getAttribute('data-lang') === activeLang;
+            t.setAttribute('aria-selected', selected ? 'true' : 'false');
+            t.tabIndex = selected ? 0 : -1;
+          });
+
+          const langData = getCurrentLangData();
+          filterHeading.textContent = `All ${langData.label} Songs`;
+
+          renderAlphabetGrid();
+          renderSongList();
+        }
+      }
+    });
+  });
+
+  const languageTabs = Array.from(langTabs.querySelectorAll('.lang-tab'));
+  languageTabs.forEach((tab, index) => {
+    tab.tabIndex = index === 0 ? 0 : -1;
+    tab.addEventListener('keydown', event => {
+      let next;
+      if (event.key === 'ArrowRight') next = (index + 1) % languageTabs.length;
+      else if (event.key === 'ArrowLeft') next = (index - 1 + languageTabs.length) % languageTabs.length;
+      else if (event.key === 'Home') next = 0;
+      else if (event.key === 'End') next = languageTabs.length - 1;
+      else return;
+      event.preventDefault(); languageTabs[next].focus(); languageTabs[next].click();
+    });
+  });
+
+  // ─── Load More Button Intercept ────────────────────────────────────
+  loadMoreBtn?.addEventListener('click', (e) => {
+    if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
+      e.preventDefault();
+      loadedCount += PER_PAGE;
+      renderSongList();
+    }
+  });
+
+  document.getElementById('reset-browse')?.addEventListener('click', () => {
+    activeLetter = ''; loadedCount = PER_PAGE;
+    filterHeading.textContent = `All ${getCurrentLangData().label} Songs`;
+    renderAlphabetGrid(); renderSongList();
+    alphaContainer.querySelector('.alpha-btn')?.focus();
+  });
+
+  // Initialize listeners
+  attachAlphaListeners();
+
+  // Scroll to search if hash is #search
+  if (window.location.hash === '#search') {
+    searchInput?.focus();
+    searchInput?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+</script>

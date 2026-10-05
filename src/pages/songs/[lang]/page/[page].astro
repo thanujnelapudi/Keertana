@@ -1,0 +1,24 @@
+---
+import { getLanguagesData } from '../../../../lib/songs';
+
+export function getStaticPaths() {
+  const languages = getLanguagesData();
+  const PER_PAGE = 24;
+
+  return languages.flatMap((lang) => {
+    const totalPages = Math.ceil(lang.songs.length / PER_PAGE);
+    const paths = [];
+
+    for (let p = 2; p <= totalPages; p++) {
+      paths.push({
+        params: { lang: lang.id, page: String(p) },
+        props: { langId: lang.id, page: p },
+      });
+    }
+    return paths;
+  });
+}
+
+const { langId, page } = Astro.props;
+return Astro.redirect(`/${langId}/page/${page}/`, 301);
+---

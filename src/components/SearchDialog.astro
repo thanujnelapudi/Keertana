@@ -1,0 +1,444 @@
+---
+// SearchDialog.astro - Unified search modal accessible from header across all pages
+---
+
+<dialog id="header-search-modal" class="search-dialog" aria-label="Search Songs">
+  <div class="search-dialog-card">
+    <!-- Header with tabs & close button -->
+    <div class="dialog-header">
+      <strong>Search song titles</strong>
+
+      <button
+        id="modal-close-btn"
+        type="button"
+        class="dialog-close-btn"
+        aria-label="Close search"
+        title="Close (Esc)"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- Search Input Box -->
+    <div class="dialog-input-wrapper">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="dialog-search-icon"
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+
+      <input
+        id="modal-search-input"
+        type="search"
+        aria-label="Search song titles"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-expanded="false"
+        aria-haspopup="listbox"
+        aria-controls="modal-suggestions-list"
+        placeholder="Search song titles (e.g. yesayya, స్తుతి)…"
+        autocomplete="off"
+        spellcheck="false"
+        class="dialog-search-input"
+      />
+
+      <button
+        id="modal-search-clear"
+        type="button"
+        aria-label="Clear search"
+        class="dialog-clear-btn"
+        style="display: none;"
+      >
+        ×
+      </button>
+    </div>
+
+    <!-- Suggestions List -->
+    <div id="modal-dropdown" class="dialog-dropdown">
+      <ul
+        id="modal-suggestions-list"
+        role="listbox"
+        aria-label="Search suggestions"
+        class="dialog-suggestions-ul"
+      >
+        <li class="dialog-initial-state">
+          Type a title in Telugu, Hindi, or Roman letters.
+        </li>
+      </ul>
+    </div>
+
+    <!-- Footer helper hint -->
+    <div class="dialog-footer">
+      <span><kbd>↑</kbd> <kbd>↓</kbd> Navigate</span>
+      <span><kbd>↵</kbd> Select</span>
+      <span><kbd>ESC</kbd> Close</span>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  .search-dialog {
+    margin: auto;
+    padding: 0;
+    border: none;
+    border-radius: 16px;
+    background: transparent;
+    max-width: 580px;
+    width: 90vw;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+  .search-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  .search-dialog-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-subtle);
+  }
+  .modal-mode-tabs {
+    display: inline-flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2px;
+  }
+  .dialog-mode-btn {
+    border: none;
+    background: transparent;
+    padding: 0.3rem 0.875rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .dialog-mode-btn.active {
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 600;
+  }
+  .dialog-close-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.125rem;
+    cursor: pointer;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+  }
+  .dialog-close-btn:hover {
+    background: var(--border-subtle);
+    color: var(--text);
+  }
+
+  .dialog-input-wrapper {
+    position: relative;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .dialog-search-icon {
+    position: absolute;
+    left: 1.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+  .dialog-search-input {
+    width: 100%;
+    height: 3rem;
+    padding: 0 2.5rem 0 2.75rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .dialog-search-input:focus {
+    border-color: var(--accent);
+  }
+  .dialog-search-input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+  }
+  .dialog-clear-btn {
+    position: absolute;
+    right: 1.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    border: none;
+    background: var(--surface-subtle);
+    color: var(--text-muted);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    font-size: 1rem;
+  }
+
+  .dialog-dropdown {
+    max-height: 360px;
+    overflow-y: auto;
+  }
+  .dialog-suggestions-ul {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem;
+  }
+  .dialog-initial-state {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+  .dialog-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 0.625rem 1rem;
+    border-top: 1px solid var(--border);
+    background: var(--surface-subtle);
+    font-size: 0.75rem;
+    color: var(--text-faint);
+  }
+  .dialog-footer kbd {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.1rem 0.35rem;
+    font-family: inherit;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  :global(.dialog-suggestion-item) {
+    display: block;
+    padding: 0.625rem 0.875rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  :global(.dialog-suggestion-item:hover),
+  :global(.dialog-suggestion-item.active-option) {
+    background: var(--accent-bg);
+    color: var(--accent);
+  }
+  :global(.dialog-suggestion-title) {
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+  :global(.dialog-suggestion-badge) {
+    font-size: 0.7rem;
+    padding: 0.125rem 0.4rem;
+    border-radius: 9999px;
+    background: var(--surface-subtle);
+    color: var(--text-muted);
+    margin-left: 0.5rem;
+  }
+  :global(.dialog-suggestion-excerpt) {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+  }
+</style>
+
+<script>
+  let modalSearchIndex = null;
+  import { searchTitles } from '../../public/title-search.js';
+  function escapeHtml(text: string) {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  let modalTimer = null;
+  let modalActiveIndex = -1;
+
+  const dialog = document.getElementById('header-search-modal') as HTMLDialogElement | null;
+  const closeBtn = document.getElementById('modal-close-btn');
+  const input = document.getElementById('modal-search-input') as HTMLInputElement | null;
+  const clearBtn = document.getElementById('modal-search-clear');
+  const suggestionsUl = document.getElementById('modal-suggestions-list');
+
+  async function loadModalIndex() {
+    if (modalSearchIndex) return modalSearchIndex;
+    try {
+      const res = await fetch('/api/search-index.json?v=title-roman-2', { cache: 'no-store' });
+      if (res.ok) modalSearchIndex = await res.json();
+    } catch {}
+    return modalSearchIndex;
+  }
+
+  export function openSearchDialog() {
+    if (dialog && !dialog.open) {
+      dialog.showModal();
+      loadModalIndex();
+      setTimeout(() => input?.focus(), 50);
+    }
+  }
+
+  // Intercept header search button
+  document.getElementById('nav-search-btn')?.addEventListener('click', (e) => {
+    // If on homepage and hero search exists, focus it or open modal
+    if (window.location.pathname === '/') {
+      const heroSearch = document.getElementById('search-input');
+      if (heroSearch) {
+        e.preventDefault();
+        heroSearch.focus();
+        heroSearch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+    }
+    e.preventDefault();
+    openSearchDialog();
+  });
+
+  // Keyboard shortcut: '/' or Ctrl/Cmd + K
+  document.addEventListener('keydown', (e) => {
+    if (
+      (e.key === '/' && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) ||
+      ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k')
+    ) {
+      e.preventDefault();
+      openSearchDialog();
+    }
+  });
+
+  closeBtn?.addEventListener('click', () => dialog?.close());
+  dialog?.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+
+  input?.addEventListener('input', triggerModalSearch);
+  clearBtn?.addEventListener('click', () => {
+    if (input) {
+      clearTimeout(modalTimer);
+      input.value = '';
+      input.removeAttribute('aria-activedescendant');
+      input.setAttribute('aria-expanded', 'false');
+      clearBtn.style.display = 'none';
+      if (suggestionsUl) suggestionsUl.innerHTML = '<li class="dialog-initial-state">Type to search Christian songs.</li>';
+      input.focus();
+    }
+  });
+
+  function triggerModalSearch() {
+    clearTimeout(modalTimer);
+    const q = input?.value.trim() || '';
+    if (!q) {
+      modalActiveIndex = -1;
+      input?.removeAttribute('aria-activedescendant');
+      input?.setAttribute('aria-expanded', 'false');
+      if (clearBtn) clearBtn.style.display = 'none';
+      if (suggestionsUl) suggestionsUl.innerHTML = '<li class="dialog-initial-state">Type to search Christian songs.</li>';
+      return;
+    }
+    if (clearBtn) clearBtn.style.display = 'grid';
+    modalActiveIndex = -1;
+    input?.removeAttribute('aria-activedescendant');
+    if (suggestionsUl) suggestionsUl.innerHTML = '<li class="dialog-initial-state">Searching titles…</li>';
+
+    modalTimer = setTimeout(() => {
+      searchModalTitles(q);
+    }, 150);
+  }
+
+  async function searchModalTitles(query: string) {
+    const index = await loadModalIndex();
+    if (!suggestionsUl || input?.value.trim() !== query) return;
+    if (!index) { suggestionsUl.textContent = 'Search could not load. Please try again.'; return; }
+
+    if (input?.value.trim() !== query) return;
+    input.setAttribute('aria-expanded', 'true');
+    input.removeAttribute('aria-activedescendant');
+    modalActiveIndex = -1;
+    const top = searchTitles(index, query);
+
+    if (top.length === 0) {
+      suggestionsUl.innerHTML = `<li class="dialog-initial-state">No songs found matching "${escapeHtml(query)}".</li>`;
+      return;
+    }
+
+    let html = '';
+    top.forEach((m, idx) => {
+      const badge = m.g === 'telugu' ? 'Telugu' : m.g === 'hindi' ? 'Hindi' : 'English';
+      html += `
+        <li role="option" id="m-opt-${idx}">
+          <a href="/song/${encodeURIComponent(m.s)}/" class="dialog-suggestion-item" data-index="${idx}">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span class="dialog-suggestion-title">${escapeHtml(m.t)}</span>
+              <span class="dialog-suggestion-badge">${badge}</span>
+            </div>
+          </a>
+        </li>
+      `;
+    });
+    suggestionsUl.innerHTML = html;
+    modalActiveIndex = -1;
+  }
+
+  input?.addEventListener('keydown', (e) => {
+    if (!suggestionsUl) return;
+    const items = suggestionsUl.querySelectorAll('.dialog-suggestion-item') as NodeListOf<HTMLAnchorElement>;
+    if (!items.length) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      modalActiveIndex = (modalActiveIndex + 1) % items.length;
+      updateModalActive(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      modalActiveIndex = (modalActiveIndex - 1 + items.length) % items.length;
+      updateModalActive(items);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (modalActiveIndex >= 0 && modalActiveIndex < items.length) {
+        items[modalActiveIndex].click();
+      } else if (items.length > 0) {
+        items[0].click();
+      }
+    }
+  });
+
+  function updateModalActive(items: NodeListOf<HTMLAnchorElement>) {
+    items.forEach((item, i) => {
+      if (i === modalActiveIndex) {
+        item.classList.add('active-option');
+        input?.setAttribute('aria-activedescendant', `m-opt-${i}`);
+        item.scrollIntoView({ block: 'nearest' });
+      } else {
+        item.classList.remove('active-option');
+      }
+    });
+  }
+</script>

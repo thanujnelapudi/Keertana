@@ -1,0 +1,154 @@
+---
+import Field from './ContributionField.astro';
+import { LANG_DEFS, songs, detectSongLanguage } from '../lib/songs';
+import { ISSUE_TYPES, INTERESTS } from '../lib/contribution.mjs';
+interface Props { kind: 'submit' | 'report' | 'join'; }
+const { kind } = Astro.props;
+const catalog = kind === 'report' ? songs.map(song => { const { langId, langLabel } = detectSongLanguage(song); return { slug: song.slug, title: song.title, langId, langLabel }; }).sort((a, b) => a.title.localeCompare(b.title)) : [];
+---
+<p class="contribution-notice"><strong>Sending is not available yet.</strong> You can prepare and check your details below. Nothing will be sent or saved; keep your own copy before leaving this page.</p>
+<noscript><p class="contribution-notice">JavaScript is needed to check these forms. Sending is not connected.</p></noscript>
+<form class="contribution-form" data-kind={kind}>
+  <p class="contribution-required-note">Fields marked * are required.</p>
+  <p id="form-status" class="contribution-status" role="status" aria-live="polite" tabindex="-1" hidden></p>
+  {kind === 'submit' && <>
+    <Field name="title" label="Song title" required placeholder="Enter the title in its original language" />
+    <div class="contribution-field"><label for="language">Language <span aria-hidden="true">*</span></label><select id="language" name="language" required aria-describedby="language-error"><option value="">Choose a language</option>{LANG_DEFS.map(language => <option value={language.id}>{language.label}</option>)}</select><p id="language-error" class="contribution-error" hidden></p></div>
+    <Field name="lyrics" label="Lyrics" required multiline placeholder={'Enter the lyrics here.\n\nLeave a blank line between verses.'} help="Keep the original line breaks and verse spacing." />
+    <Field name="transliteration" label="Transliteration" help="The title in Roman characters can help people search without a Telugu or Hindi keyboard." placeholder="Song title using Roman characters" />
+    <details class="contribution-details"><summary>Additional song details (optional)</summary><div class="contribution-details-body">
+      <Field name="alternateTitle" label="Alternate title" />
+      <Field name="author" label="Author / Composer" />
+      <Field name="source" label="Source / Reference" help="A link, book, recording, or other source that helps us verify the lyrics." />
+      <Field name="category" label="Category" placeholder="For example, hymn or worship song" />
+      <Field name="notes" label="Additional notes" multiline />
+    </div></details>
+    <Field name="name" label="Contributor name" autocomplete="name" />
+    <Field name="email" label="Contributor email" type="email" autocomplete="email" />
+    <div class="contribution-field"><label class="contribution-check" for="acknowledgement"><input id="acknowledgement" name="acknowledgement" type="checkbox" value="yes" required aria-describedby="acknowledgement-error" /><span>I confirm that this information is accurate to the best of my knowledge and that I have the right to share this material, or am providing it as a reference for review. *</span></label><p id="acknowledgement-error" class="contribution-error" hidden></p></div>
+  </>}
+  {kind === 'report' && <>
+    <div class="contribution-field"><label for="song">Song <span aria-hidden="true">*</span></label><select id="song" name="song" required aria-describedby="song-error song-help"><option value="">Choose a song</option>{catalog.map(song => <option value={song.slug} data-title={song.title} data-language={song.langId} data-label={song.langLabel}>{song.title} — {song.langLabel}</option>)}</select><p id="song-help" class="contribution-help">You can also open this form from a song’s Report an Error link.</p><p id="song-context" class="contribution-context" hidden></p><p id="song-error" class="contribution-error" hidden></p></div>
+    <div class="contribution-field"><label for="issue">Issue type <span aria-hidden="true">*</span></label><select id="issue" name="issue" required aria-describedby="issue-error issue-help"><option value="">Choose an issue type</option>{ISSUE_TYPES.map(issue => <option value={issue}>{issue}</option>)}</select><p id="issue-help" class="contribution-help" hidden>For a copyright or content concern, include the relevant source and rights-holder information in your description. This prepares a report only; sending is not available.</p><p id="issue-error" class="contribution-error" hidden></p></div>
+    <Field name="description" label="What needs correcting?" required multiline placeholder="Describe the issue and where it occurs in the song." />
+    <Field name="correction" label="Suggested correction" multiline placeholder={'Current text:\n\nSuggested text:'} />
+    <Field name="name" label="Contributor name" autocomplete="name" />
+    <Field name="email" label="Contributor email" type="email" autocomplete="email" />
+  </>}
+  {kind === 'join' && <>
+    <Field name="name" label="Name" required autocomplete="name" />
+    <Field name="email" label="Email" required type="email" autocomplete="email" />
+    <fieldset id="interests" aria-describedby="interests-error"><legend>Areas of interest <span aria-hidden="true">*</span></legend><p class="contribution-help">Choose all the areas you’d like to help with.</p><div class="contribution-choices">{INTERESTS.map((interest, index) => <label class="contribution-check" for={`interest-${index}`}><input id={`interest-${index}`} type="checkbox" name="interests" value={interest} /><span>{interest}</span></label>)}</div><p id="interests-error" class="contribution-error" hidden></p></fieldset>
+    <Field name="skills" label="Skills / experience" multiline help="No résumé needed. Tell us what you enjoy doing or would like to learn." />
+    <Field name="motivation" label="Why would you like to contribute?" multiline />
+    <Field name="portfolio" label="Portfolio / GitHub / website" type="url" placeholder="https://" />
+  </>}
+  <button type="submit" class="contribution-button" disabled>Check details</button>
+</form>
+<p class="contribution-help"><a href="/privacy/#information" class="contribution-link">How these forms handle your details</a></p>
+<script>
+  import { sendContribution, validateContribution } from '../lib/contribution.mjs';
+  const form = document.querySelector<HTMLFormElement>('.contribution-form');
+  if (form) {
+    // Do not let an unconnected form navigate or leak details into a URL.
+    form.noValidate = true;
+    const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+    const status = form.querySelector<HTMLElement>('#form-status')!;
+    const kind = form.dataset.kind!;
+    const song = form.querySelector<HTMLSelectElement>('#song');
+    const language = form.querySelector<HTMLSelectElement>('#language');
+    const context = form.querySelector<HTMLElement>('#song-context');
+    const issue = form.querySelector<HTMLSelectElement>('#issue');
+    if (issue) {
+      if (new URLSearchParams(location.search).get('issue') === 'copyright') issue.value = 'Copyright / content concern';
+      const updateIssueHelp = () => { form.querySelector<HTMLElement>('#issue-help')!.hidden = issue.value !== 'Copyright / content concern'; };
+      updateIssueHelp();
+      issue.addEventListener('change', updateIssueHelp);
+      form.addEventListener('reset', () => { form.querySelector<HTMLElement>('#issue-help')!.hidden = true; });
+    }
+    const selectedSong = () => song?.selectedOptions[0];
+    const updateContext = () => {
+      if (!context || !song) return;
+      context.replaceChildren();
+      context.hidden = !song.value;
+      if (song.value) {
+        const link = document.createElement('a');
+        link.href = `/song/${encodeURIComponent(song.value)}/`;
+        link.className = 'contribution-link';
+        link.textContent = `View song · ${selectedSong()?.dataset.label}`;
+        context.append(link);
+      }
+    };
+    if (song) {
+      const slug = new URLSearchParams(location.search).get('song');
+      if (slug) {
+        if (Array.from(song.options).some(option => option.value === slug)) song.value = slug;
+        else { status.hidden = false; status.textContent = 'That song could not be found. Please choose a song below.'; }
+      }
+      updateContext();
+      song.addEventListener('change', updateContext);
+    }
+    function clearErrors() {
+      form!.querySelectorAll<HTMLElement>('.contribution-error').forEach(error => { error.hidden = true; error.textContent = ''; });
+      form!.querySelectorAll('[aria-invalid]').forEach(control => control.removeAttribute('aria-invalid'));
+    }
+    // A completion message describes the checked draft, not later edits.
+    form.addEventListener('input', () => { status.hidden = true; });
+    form.addEventListener('change', () => { status.hidden = true; });
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      if (button.disabled) return;
+      clearErrors();
+      status.hidden = true;
+      const data = new FormData(form);
+      const values: Record<string, FormDataEntryValue | FormDataEntryValue[]> = Object.fromEntries(data.entries());
+      if (kind === 'join') values.interests = data.getAll('interests');
+      const errors = validateContribution(kind, values, {
+        languages: language ? Array.from(language.options).map(option => option.value).filter(Boolean) : [],
+        songSlugs: song ? Array.from(song.options).map(option => option.value).filter(Boolean) : [],
+      });
+      const entries = Object.entries(errors);
+      if (entries.length) {
+        for (const [name, message] of entries) {
+          const control = form.querySelector<HTMLElement>(`#${name}`)!;
+          control.setAttribute('aria-invalid', 'true');
+          const error = form.querySelector<HTMLElement>(`#${name}-error`)!;
+          error.textContent = String(message);
+          error.hidden = false;
+          const details = control.closest('details');
+          if (details) details.open = true;
+        }
+        status.textContent = `Please check ${entries.length === 1 ? 'the highlighted field' : `the ${entries.length} highlighted fields`}. Nothing has been sent.`;
+        status.hidden = false;
+        const first = form.querySelector<HTMLElement>(`#${entries[0][0]}`)!;
+        (first.matches('fieldset') ? first.querySelector<HTMLElement>('input') : first)?.focus();
+        return;
+      }
+      button.disabled = true;
+      button.textContent = 'Checking…';
+      form.setAttribute('aria-busy', 'true');
+      try {
+        const result = await sendContribution({ kind, ...values, ...(song ? { songTitle: selectedSong()?.dataset.title, language: selectedSong()?.dataset.language } : {}) });
+        // Only an explicitly confirmed receipt from a future receiver may show success.
+        if (result.status === 'received' && result.receipt?.trim()) {
+          const thanks = { submit: 'Thank you for helping grow Keertana.', report: 'Thank you for helping keep Keertana accurate.', join: 'Thank you for your interest in helping Keertana.' };
+          status.textContent = `${thanks[kind as keyof typeof thanks]} Your contribution has been received.`;
+          form.reset();
+          updateContext();
+        } else if (result.status === 'unavailable') {
+          status.textContent = 'Your details are ready. Sending is not connected yet, so nothing has been submitted or saved. Your entries remain here; keep your own copy before leaving.';
+        } else { throw new Error('Unconfirmed receipt'); }
+      } catch {
+        status.textContent = 'We couldn’t send this right now. Your entries remain here. Please try again once sending is available.';
+      } finally {
+        form.removeAttribute('aria-busy');
+        button.disabled = false;
+        button.textContent = 'Check details';
+        status.hidden = false;
+        status.focus();
+      }
+    });
+    button.disabled = false;
+    window.addEventListener('pageshow', () => { button.disabled = false; button.textContent = 'Check details'; form.removeAttribute('aria-busy'); });
+  }
+</script>

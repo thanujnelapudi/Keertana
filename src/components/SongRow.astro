@@ -1,0 +1,8 @@
+---
+interface Props { song: {slug: string; title: string}; label: string; locale: string; }
+const { song, label, locale } = Astro.props;
+---
+<a href={`/song/${encodeURIComponent(song.slug)}/`} class="song-row" data-song-slug={song.slug}>
+  <span class="song-row-content"><span class="song-title" lang={locale}>{song.title}</span><span class="song-language">{label}</span></span>
+  <span class="browse-saved" hidden>Saved</span><span class="song-arrow" aria-hidden="true">→</span>
+</a>

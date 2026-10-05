@@ -1,0 +1,30 @@
+/* Page-level refinements only: the global header, footer and reader stay intact. */
+.hero-section.library-hero, .hero-section.collection-hero { background: none !important; padding-block: 2.5rem 2rem !important; }
+.hero-section.library-hero::before, .hero-section.collection-hero::before { display: none; }
+.hero-section.library-hero { text-align: left !important; }
+.library-hero > .container-page { max-width: 1120px !important; }
+.hero-section.library-hero h1, .hero-section.collection-hero h1 { font-family: var(--font-sans); font-size: clamp(1.875rem,5vw,2.5rem) !important; font-weight: 700 !important; line-height: 1.3 !important; }
+.hero-section.library-hero h1 { font-size: clamp(2.125rem,5vw,3.25rem) !important; max-width: 760px; }
+.library-hero p { font-size: 1rem !important; max-width: 640px !important; margin-left: 0 !important; text-wrap: initial; }
+.library-hero #search { margin-inline: 0 !important; filter: none; max-width: 640px !important; }
+.library-hero #search-input { font-size: 1rem !important; box-shadow: none !important; border-radius: 10px !important; }
+.library-hero #search-clear { width: 44px !important; height: 44px !important; right: .35rem !important; }
+.browse-shortcuts { display: flex; flex-wrap: wrap; gap: .25rem 1.5rem; margin-top: 1rem; }
+.browse-shortcuts a { min-height: 44px; display: inline-flex; align-items: center; color: var(--accent); font-size: .875rem; text-decoration: underline; text-underline-offset: 4px; }
+.browse-shortcuts [hidden], .browse-saved[hidden] { display: none !important; }
+#browse-filters { scroll-margin-top: 6rem; }
+.browse-section #song-list .song-row { padding: .875rem .75rem; gap: .75rem; transition: background-color .15s, color .15s; min-height: 76px; }
+.browse-section #song-list .song-row:hover, .browse-section #song-list .song-row:focus-visible { padding-left: .75rem; background: var(--surface); color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.song-row-content { min-width: 0; flex: 1; }
+.browse-section #song-list .song-title { display: block; font-size: 1.0625rem; font-weight: 500; line-height: 1.65; overflow-wrap: anywhere; }
+.song-language { display: block; color: var(--text-muted); font-size: .75rem; line-height: 1.5; margin-top: .25rem; }
+.browse-saved { font-size: .75rem; color: var(--accent); flex-shrink: 0; }
+.browse-section .alpha-btn { min-width: 44px; min-height: 44px; }
+.browse-section .lang-tab { min-height: 44px; }
+#search .suggestion-title { overflow-wrap: anywhere; min-width: 0; flex: 1; }
+#search .suggestion-badge { flex-shrink: 0; }
+#song-count-badge { white-space: nowrap; }
+.browse-section #current-filter-heading { line-height: 1.7; }
+.browse-section #no-results button { min-height: 44px; color: var(--accent); text-decoration: underline; text-underline-offset: 4px; padding: .5rem; cursor: pointer; }
+.browse-section :is(a,button):focus-visible, .browse-shortcuts a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media(max-width:480px) { .hero-section.library-hero, .hero-section.collection-hero { padding-block: 1.5rem !important; } #song-count-badge { font-size: .75rem !important; } .browse-section #song-list .song-row { padding-inline: .5rem; } .browse-section #song-list .song-row:hover, .browse-section #song-list .song-row:focus-visible { padding-left: .5rem; } }

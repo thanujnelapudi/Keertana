@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Keertana — an open songbook and cross</title>
+  <rect width="80" height="80" rx="18" fill="#AA4527"/>
+  <path d="M14 32c9-3 18-1 26 4 8-5 17-7 26-4v27c-9-3-18-1-26 4-8-5-17-7-26-4V32Z" stroke="#FBF8F3" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M40 36v27M23 42c4 0 7 1 10 3m-10 5c4 0 7 1 10 3m14-8c3-2 6-3 10-3m-10 11c3-2 6-3 10-3" stroke="#FBF8F3" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M40 15v15m-6-9h12" stroke="#FBF8F3" stroke-width="3.5" stroke-linecap="round"/>
+</svg>

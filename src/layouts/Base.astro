@@ -1,0 +1,302 @@
+---
+import '@fontsource-variable/noto-sans-telugu';
+import '@fontsource-variable/noto-sans-devanagari';
+import '../styles/global.css';
+import SearchDialog from '../components/SearchDialog.astro';
+import BrandLogo from '../components/BrandLogo.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  jsonLd?: object[];
+  /** Show a full-width main (no max-width container) — default false */
+  wide?: boolean;
+  lang?: string;
+  canonical?: string;
+  noindex?: boolean;
+  ogType?: string;
+  ogImage?: string;
+  ogLocale?: string;
+  hreflang?: { lang: string; href: string }[];
+  /** Song context for the contribution report link. */
+  songTitle?: string;
+  songSlug?: string;
+}
+const {
+  title,
+  description,
+  jsonLd = [],
+  wide = false,
+  lang = 'en',
+  canonical,
+  noindex = false,
+  ogType = 'website',
+  ogImage = '/brand/keertana-icon.png',
+  ogLocale,
+  hreflang = [],
+  songTitle,
+  songSlug,
+} = Astro.props;
+
+const reportHref = songSlug ? `/contribute/report/?song=${encodeURIComponent(songSlug)}` : '/contribute/report/';
+
+const siteUrl = Astro.site ? Astro.site.href.replace(/\/$/, '') : 'https://keertana.vercel.app';
+const pathname = Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const canonicalUrl = canonical || `${siteUrl}${pathname}`;
+const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage.startsWith('/') ? ogImage : `/${ogImage}`}`;
+const ld = (o: object) => JSON.stringify(o).replace(/</g, '\\u003c');
+const year = new Date().getFullYear();
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/png" sizes="32x32" href="/brand/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/brand/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#aa4527" />
+    <link rel="canonical" href={canonicalUrl} />
+    {noindex ? (
+      <meta name="robots" content="noindex, follow" />
+    ) : (
+      <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+    )}
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content="Keertana" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    {ogLocale && <meta property="og:locale" content={ogLocale} />}
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    {hreflang.map((h) => <link rel="alternate" hreflang={h.lang} href={h.href} />)}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    {jsonLd.map((o) => <script type="application/ld+json" set:html={ld(o)} />)}
+    <script is:inline>
+      // Apply saved theme and font size immediately to avoid flash
+      (function () {
+        var saved = localStorage.getItem('keertana-theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = saved || (prefersDark ? 'dark' : 'light');
+        if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        var fs = localStorage.getItem('keertana-font-size');
+        if (fs) document.documentElement.style.setProperty('--lyrics-font-size', fs + 'px');
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- ─── Navigation ──────────────────────────────────────────────── -->
+    <header id="top" class="site-header" style="
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--nav-bg);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    ">
+      <div class="container-page" style="
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 60px;
+      ">
+        <!-- Brand -->
+        <a href="/" class="brand-mark" style="
+          font-size: 1.25rem;
+          font-weight: 700;
+          letter-spacing: -0.02em;
+          color: var(--text);
+          text-decoration: none;
+          transition: color 0.15s;
+        " aria-label="Keertana — Home">
+          <BrandLogo />
+        </a>
+
+        <!-- Right nav actions -->
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <!-- Search shortcut button (opens search in hero on index, or goes to / on other pages) -->
+          <a
+            href="/#search"
+            id="nav-search-btn"
+            title="Search songs"
+            aria-label="Search songs"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 0.4rem;
+              padding: 0.4rem 0.75rem;
+              border-radius: 8px;
+              border: 1px solid var(--border);
+              background: var(--surface);
+              color: var(--text-muted);
+              font-size: 0.85rem;
+              cursor: pointer;
+              text-decoration: none;
+              transition: all 0.15s;
+            "
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <span style="display: none;">Search</span>
+          </a>
+
+          <!-- Theme toggle -->
+          <button
+            id="theme-toggle"
+            title="Toggle theme"
+            aria-label="Toggle light/dark theme"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 2.25rem;
+              height: 2.25rem;
+              border-radius: 8px;
+              border: 1px solid var(--border);
+              background: var(--surface);
+              color: var(--text-muted);
+              cursor: pointer;
+              transition: all 0.15s;
+            "
+          >
+            <!-- Sun icon (shown in dark mode to switch to light) -->
+            <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+              <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+            </svg>
+            <!-- Moon icon (shown in light mode to switch to dark) -->
+            <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <SearchDialog />
+
+    <!-- ─── Main ────────────────────────────────────────────────────── -->
+    <main>
+      <slot />
+    </main>
+
+    <!-- ─── Footer ──────────────────────────────────────────────────── -->
+    <footer class="site-footer">
+      <div class="container-page footer-inner">
+        <div class="footer-grid">
+          <div class="footer-brand-area">
+            <a href="/" class="footer-brand" aria-label="Keertana — Home"><BrandLogo /></a>
+            <p class="footer-description">A multilingual library of Christian worship songs and hymns.</p>
+          </div>
+          <nav aria-label="Song collections">
+            <h2 class="footer-heading">Songs</h2>
+            <ul class="footer-links">
+              <li><a href="/telugu/" class="footer-link">Telugu Songs</a></li>
+              <li><a href="/hindi/" class="footer-link">Hindi Songs</a></li>
+              <li><a href="/english/" class="footer-link">English Songs</a></li>
+            </ul>
+          </nav>
+          <div>
+            <h2 class="footer-heading">Contribute</h2>
+            <ul class="footer-links">
+              <li><a class="footer-link" href="/contribute/submit/">Submit a Song</a></li>
+              <li><a class="footer-link" href={reportHref}>Report an Error</a></li>
+            </ul>
+            <p class="footer-contact-note"><a href="/contribute/">Help grow Keertana.</a></p>
+          </div>
+          <nav aria-label="About Keertana">
+            <h2 class="footer-heading">Info</h2>
+            <ul class="footer-links">
+              <li><a href="/about/" class="footer-link">About</a></li>
+              <li><a href="/contact/" class="footer-link">Contact</a></li>
+            </ul>
+          </nav>
+        </div>
+        <div class="footer-bottom">
+          <p>Keertana · {year} · Song rights belong to their respective owners.</p>
+          <a href="#top" class="footer-back-top">↑ Back to top</a>
+        </div>
+      </div>
+    </footer>
+
+    <style>
+      .site-footer { border-top: 1px solid var(--border); background: var(--surface-subtle); margin-top: 3rem; }
+      .footer-inner { padding-top: 2.5rem; padding-bottom: 1.5rem; }
+      .footer-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+      .footer-brand { font-size: 1.125rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text); min-height: 44px; }
+      .footer-description { font-size: 0.875rem; color: var(--text-muted); line-height: 1.7; max-width: 280px; margin: 0.5rem 0 0; }
+      .footer-heading { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin: 0 0 0.375rem; }
+      .footer-links { list-style: none; padding: 0; margin: 0; }
+      .footer-link, .footer-unavailable { display: inline-flex; align-items: center; min-height: 44px; padding-block: 0.375rem; font-size: 0.875rem; }
+      .footer-unavailable { color: var(--text-muted); }
+      .footer-contact-note { font-size: 0.75rem; color: var(--text-muted); margin: 0.25rem 0 0; }
+      .footer-link:hover { color: var(--accent); }
+      .footer-link:active, .footer-back-top:active { color: var(--accent-hover); }
+      .footer-bottom { border-top: 1px solid var(--border); margin-top: 1.75rem; padding-top: 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; color: var(--text-muted); font-size: 0.8125rem; }
+      .footer-bottom p { margin: 0; }
+      .footer-back-top { display: inline-flex; align-items: center; min-height: 44px; transition: color 0.15s; }
+      .footer-back-top:hover { color: var(--accent); }
+      @media (min-width: 640px) { .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem; } }
+      @media (min-width: 900px) { .footer-grid { grid-template-columns: 1.6fr 1fr 1fr 0.8fr; gap: 2.5rem; } }
+      @media (min-width: 640px) {
+
+        #nav-search-btn span {
+          display: inline !important;
+        }
+      }
+      #theme-toggle:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: var(--accent-bg);
+      }
+
+    </style>
+
+    <script>
+      // ─── Theme toggle logic ──────────────────────────────────────────
+      const toggle = document.getElementById('theme-toggle');
+      const iconSun = document.getElementById('icon-sun');
+      const iconMoon = document.getElementById('icon-moon');
+
+      function applyTheme(theme: string) {
+        if (theme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          if (iconSun) iconSun.style.display = 'block';
+          if (iconMoon) iconMoon.style.display = 'none';
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+          if (iconSun) iconSun.style.display = 'none';
+          if (iconMoon) iconMoon.style.display = 'block';
+        }
+        localStorage.setItem('keertana-theme', theme);
+      }
+
+      // Initialize icon state
+      const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      applyTheme(current);
+
+      toggle?.addEventListener('click', () => {
+        const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
+      });
+
+      // ─── Service Worker registration ─────────────────────────────────
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch((err) => {
+            console.warn('SW registration failed:', err);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

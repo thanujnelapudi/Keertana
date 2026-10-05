@@ -1,0 +1,15 @@
+---
+import Base from './Base.astro';
+import '../styles/contribution.css';
+const { title, description, hub = false } = Astro.props;
+---
+<Base title={`${title} | Keertana`} description={description}>
+  <div class="contribution-page container-page">
+    <nav class="contribution-breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Keertana</a><span aria-hidden="true">/</span>
+      {hub ? <span aria-current="page">Contribute</span> : <><a href="/contribute/">Contribute</a><span aria-hidden="true">/</span><span aria-current="page">{title}</span></>}
+    </nav>
+    <header class="contribution-intro"><h1>{title}</h1><p>{description}</p></header>
+    <slot />
+  </div>
+</Base>

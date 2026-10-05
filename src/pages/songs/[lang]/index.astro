@@ -1,0 +1,13 @@
+---
+import { getLanguagesData } from '../../../lib/songs';
+
+export function getStaticPaths() {
+  const languages = getLanguagesData();
+  return languages.map((lang) => ({
+    params: { lang: lang.id },
+  }));
+}
+
+const { lang } = Astro.params;
+return Astro.redirect(`/${lang}/`, 301);
+---

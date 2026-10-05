@@ -1,0 +1,10 @@
+---
+interface Props { name: string; label: string; required?: boolean; type?: string; multiline?: boolean; help?: string; placeholder?: string; autocomplete?: string; }
+const { name, label, required = false, type = 'text', multiline = false, help, placeholder, autocomplete } = Astro.props;
+---
+<div class="contribution-field">
+  <label for={name}>{label} {required ? <span aria-hidden="true">*</span> : <span class="contribution-optional">(optional)</span>}</label>
+  {multiline ? <textarea id={name} name={name} required={required} placeholder={placeholder} aria-describedby={`${name}-error${help ? ` ${name}-help` : ''}`}></textarea> : <input id={name} name={name} type={type} required={required} autocomplete={autocomplete} placeholder={placeholder} aria-describedby={`${name}-error${help ? ` ${name}-help` : ''}`} />}
+  {help && <p id={`${name}-help`} class="contribution-help">{help}</p>}
+  <p id={`${name}-error`} class="contribution-error" hidden></p>
+</div>

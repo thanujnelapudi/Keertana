@@ -1,0 +1,79 @@
+---
+import Base from '../layouts/Base.astro';
+
+const siteUrl = Astro.site ? Astro.site.href.replace(/\/$/, '') : 'https://keertana.vercel.app';
+const canonical = `${siteUrl}/contact/`;
+---
+<Base
+  title="Contact | Keertana"
+  description="Get in touch with Keertana — submit songs, report errors, or send feedback."
+  canonical={canonical}
+>
+  <div class="container-page" style="max-width: 640px; margin-inline: auto; padding-top: 3.5rem; padding-bottom: 4rem;">
+
+    <nav aria-label="Breadcrumb" style="margin-bottom: 2rem;">
+      <ol style="list-style: none; padding: 0; margin: 0; display: flex; align-items: center; gap: 0.375rem; font-size: 0.8125rem; color: var(--text-faint);">
+        <li><a href="/" style="color: var(--text-muted); text-decoration: none; transition: color 0.15s;">Keertana</a></li>
+        <li style="opacity: 0.5;">›</li>
+        <li aria-current="page" style="color: var(--text-faint);">Contact</li>
+      </ol>
+    </nav>
+
+    <h1 style="
+      font-size: clamp(1.75rem, 5vw, 2.5rem);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+      color: var(--text);
+      margin: 0 0 1.5rem;
+      font-family: Georgia, 'Noto Sans Telugu Variable', serif;
+    ">Contact Us</h1>
+
+    <div style="font-size: 1rem; line-height: 1.8; color: var(--text-muted);">
+      <p style="margin: 0 0 2rem;">
+        Explore the contribution options below. The forms currently check details only and cannot deliver a message.
+      </p>
+
+      <div style="display: grid; gap: 1rem; grid-template-columns: 1fr;">
+
+        <a href="/contribute/submit/" style="
+          display: flex; align-items: center; gap: 0.875rem; padding: 1.25rem; border-radius: 12px;
+          border: 1px solid var(--border); background: var(--surface); text-decoration: none;
+          transition: border-color 0.15s, box-shadow 0.15s;
+        ">
+          <span style="font-size: 1.5rem;" aria-hidden="true">🎵</span>
+          <div>
+            <span style="font-weight: 600; color: var(--text); display: block;">Submit a Song</span>
+            <span style="font-size: 0.875rem; color: var(--text-muted);">Share a song that's missing from our collection.</span>
+          </div>
+        </a>
+
+        <a href="/contribute/report/" style="
+          display: flex; align-items: center; gap: 0.875rem; padding: 1.25rem; border-radius: 12px;
+          border: 1px solid var(--border); background: var(--surface); text-decoration: none;
+          transition: border-color 0.15s, box-shadow 0.15s;
+        ">
+          <span style="font-size: 1.5rem;" aria-hidden="true">🐛</span>
+          <div>
+            <span style="font-weight: 600; color: var(--text); display: block;">Report an Error</span>
+            <span style="font-size: 0.875rem; color: var(--text-muted);">Found a mistake in the lyrics? Let us know.</span>
+          </div>
+        </a>
+
+        <a href="/contribute/" style="
+          display: flex; align-items: center; gap: 0.875rem; padding: 1.25rem; border-radius: 12px;
+          border: 1px solid var(--border); background: var(--surface); text-decoration: none;
+          transition: border-color 0.15s, box-shadow 0.15s;
+        ">
+          <span style="font-size: 1.5rem;" aria-hidden="true">💬</span>
+          <div>
+            <span style="font-weight: 600; color: var(--text); display: block;">Help grow Keertana</span>
+            <span style="font-size: 0.875rem; color: var(--text-muted);">Explore contributions and joining the team. Sending is not connected yet.</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+</Base>

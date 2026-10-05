@@ -1,0 +1,8 @@
+---
+import Contribution from '../../layouts/Contribution.astro';
+import ContributionForm from '../../components/ContributionForm.astro';
+---
+<Contribution title="Submit a Song" description="Share a song that’s missing from Keertana. Start with its title, language, and lyrics.">
+  <ContributionForm kind="submit" />
+  <p class="contribution-related">Found an existing song that needs correcting? <a class="contribution-link" href="/contribute/report/">Report an Error</a></p>
+</Contribution>

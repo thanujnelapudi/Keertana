@@ -1,0 +1,389 @@
+---
+import SongRow from '../../components/SongRow.astro';
+import BrowseEnhancements from '../../components/BrowseEnhancements.astro';
+import Base from '../../layouts/Base.astro';
+import { getLanguagesData, getFirstChar, type LangData, type LetterGroup, type Song } from '../../lib/songs';
+
+export function getStaticPaths() {
+  const languages = getLanguagesData();
+  return languages.flatMap((lang) =>
+    lang.letters.map((letter) => {
+      const letterSongs = lang.songs.filter((s) => {
+        const fc = getFirstChar(s.title, lang.id);
+        return fc === letter.char;
+      });
+      return {
+        params: { lang: lang.id, letter: letter.char },
+        props: { lang, letter, letterSongs, allLanguages: languages },
+      };
+    })
+  );
+}
+
+interface Props {
+  lang: LangData;
+  letter: LetterGroup;
+  letterSongs: Song[];
+  allLanguages: LangData[];
+}
+
+const { lang, letter, letterSongs, allLanguages } = Astro.props;
+
+const siteUrl = Astro.site ? Astro.site.href.replace(/\/$/, '') : 'https://keertana.vercel.app';
+const canonical = `${siteUrl}/${lang.id}/${encodeURIComponent(letter.char)}/`;
+
+const title = `${lang.label} Christian Songs Starting with '${letter.char}' | Keertana`;
+const description = `Explore ${letterSongs.length} ${lang.label} Christian worship songs starting with '${letter.char}'. Complete lyrics on Keertana.`;
+
+const PER_PAGE = 24;
+const totalPages = Math.ceil(letterSongs.length / PER_PAGE);
+const initialSongs = letterSongs.slice(0, PER_PAGE);
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: `${lang.label} Songs Starting with '${letter.char}'`,
+    url: canonical,
+    description,
+    inLanguage: lang.locale,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Keertana', item: `${siteUrl}/` },
+      { '@type': 'ListItem', position: 2, name: `${lang.label} Songs`, item: `${siteUrl}/${lang.id}/` },
+      { '@type': 'ListItem', position: 3, name: `'${letter.char}' Songs`, item: canonical },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `${lang.label} Songs - '${letter.char}'`,
+    numberOfItems: letterSongs.length,
+    itemListElement: initialSongs.map((s, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: s.title,
+      url: `${siteUrl}/song/${s.slug}/`,
+    })),
+  },
+];
+
+const songsData = letterSongs.map((s) => ({ slug: s.slug, title: s.title }));
+---
+
+<Base
+  title={title}
+  description={description}
+  jsonLd={jsonLd}
+  canonical={canonical}
+  lang={lang.locale}
+  ogLocale={lang.locale === 'te' ? 'te_IN' : lang.locale === 'hi' ? 'hi_IN' : 'en_US'}
+>
+  <!-- Hero Section -->
+  <section class="hero-section collection-hero" style="
+    padding-top: 4.5rem;
+    padding-bottom: 3.5rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  ">
+    <div class="container-page" style="max-width: 720px; margin-inline: auto;">
+      <!-- Breadcrumb -->
+      <nav aria-label="Breadcrumb" style="margin-bottom: 1.5rem;">
+        <ol style="list-style: none; padding: 0; margin: 0; display: inline-flex; align-items: center; gap: 0.375rem; font-size: 0.8125rem; color: var(--text-faint); flex-wrap: wrap; justify-content: center;">
+          <li><a href="/" style="color: var(--text-muted); text-decoration: none; transition: color 0.15s;">Keertana</a></li>
+          <li style="opacity: 0.5;">›</li>
+          <li><a href={`/${lang.id}/`} style="color: var(--text-muted); text-decoration: none; transition: color 0.15s;">{lang.label} Songs</a></li>
+          <li style="opacity: 0.5;">›</li>
+          <li aria-current="page" style="color: var(--text); font-weight: 500;">'{letter.char}'</li>
+        </ol>
+      </nav>
+
+      <!-- Letter and song count -->
+      <h1 style="
+        font-size: clamp(2.25rem, 6vw, 3.75rem);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+        color: var(--text);
+        margin: 0 0 0.5rem;
+      ">
+        {letter.char} <span style="font-weight: 400; color: var(--text-muted); font-size: clamp(1.25rem, 3.5vw, 2rem);">· {letterSongs.length} {letterSongs.length === 1 ? 'song' : 'songs'}</span>
+      </h1>
+      <p style="
+        font-size: 1.0625rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin: 0;
+      ">
+        {lang.label} Christian songs and hymns starting with the letter <strong style="color: var(--text);">{letter.char}</strong>.
+      </p>
+    </div>
+  </section>
+
+  <!-- Letter Navigation and Song Listing -->
+  <section class="browse-section" style="padding-top: 3rem; padding-bottom: 5rem;">
+    <div class="container-page">
+
+      <!-- Letter Filter Grid -->
+      <div style="margin-bottom: 2.5rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.875rem;">
+          <h2 style="
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-faint);
+            margin: 0;
+          ">Select First Letter</h2>
+          <a href={`/${lang.id}/`} style="font-size: 0.8125rem; color: var(--accent); text-decoration: none;">← View All {lang.label} Songs</a>
+        </div>
+
+        <div class="alpha-grid" role="group" aria-label={`${lang.label} alphabet filter`}>
+          <!-- 'All' Option -->
+          <a
+            href={`/${lang.id}/`}
+            class="alpha-btn"
+            title="All songs"
+          >
+            All
+          </a>
+
+          <!-- Alphabet letters -->
+          {lang.allLetters.filter(l => l.count > 0).map((l) => {
+            const isActive = l.char === letter.char;
+            return l.count > 0 ? (
+              <a
+                href={`/${lang.id}/${encodeURIComponent(l.char)}/`}
+                class={`alpha-btn ${isActive ? 'active' : ''}`}
+                aria-current={isActive ? 'page' : undefined}
+                title={`${l.char} · ${l.count} ${l.count === 1 ? 'song' : 'songs'}`}
+              >
+                {l.char}
+              </a>
+            ) : null;
+          })}
+        </div>
+      </div>
+
+      <!-- Song List Header -->
+      <div style="
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border);
+      ">
+        <h3 style="
+          font-size: 0.8125rem;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--text-muted);
+          margin: 0;
+        ">
+          Songs starting with '{letter.char}'
+        </h3>
+        <span id="song-count-badge" style="font-size: 0.8125rem; color: var(--text-faint);">
+          Showing 1–{Math.min(initialSongs.length, letterSongs.length)} of {letterSongs.length}
+        </span>
+      </div>
+
+      <!-- Songs list -->
+      <div id="song-list" data-language={lang.label} data-locale={lang.locale} style="
+        display: grid;
+        grid-template-columns: 1fr;
+      ">
+        {initialSongs.map((song) => (
+          <SongRow song={song} label={lang.label} locale={lang.locale} />
+        ))}
+      </div>
+
+      <!-- Load More / Progressive Enhancement -->
+      {totalPages > 1 && (
+        <div id="load-more-container" style="margin-top: 3rem; text-align: center;">
+          <button
+            id="load-more-btn"
+            type="button"
+            class="load-more-button"
+          >
+            Load more songs
+          </button>
+        </div>
+      )}
+
+      <!-- Back link -->
+      <div style="margin-top: 3.5rem; text-align: center;">
+        <a
+          href={`/${lang.id}/`}
+          style="
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.15s;
+          "
+        >
+          ← Back to all {lang.label} songs
+        </a>
+      </div>
+
+    </div>
+  </section>
+  <BrowseEnhancements />
+</Base>
+
+<style>
+  .alpha-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  :global(.alpha-btn) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding: 0 0.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  :global(.alpha-btn:hover:not(.alpha-btn-disabled)) {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-bg);
+  }
+
+  :global(.alpha-btn.active) {
+    background: var(--accent) !important;
+    color: var(--on-accent) !important;
+    border-color: var(--accent) !important;
+    font-weight: 700;
+  }
+
+  :global(.alpha-btn-disabled) {
+    opacity: 0.35;
+    cursor: not-allowed;
+    background: transparent;
+    border-color: var(--border-subtle);
+    color: var(--text-faint);
+  }
+
+  :global(.song-row) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 0.25rem;
+    min-height: 3.5rem;
+    border-bottom: 1px solid var(--border-subtle);
+    text-decoration: none;
+    color: var(--text);
+    transition: background 0.1s, padding-left 0.1s;
+    gap: 1rem;
+    border-radius: 0;
+  }
+  :global(.song-row:hover) {
+    background: var(--surface);
+    padding-left: 0.75rem;
+    color: var(--accent);
+  }
+  :global(.song-row:hover .song-arrow) {
+    color: var(--accent);
+    transform: translateX(2px);
+  }
+  :global(.song-title) {
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.5;
+    flex: 1;
+    min-width: 0;
+  }
+  :global(.song-arrow) {
+    color: var(--text-muted);
+    opacity: 1;
+    flex-shrink: 0;
+    font-size: 1rem;
+    transition: color 0.15s, transform 0.15s;
+  }
+
+  .load-more-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 2rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.15s ease;
+  }
+  .load-more-button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-bg);
+  }
+
+  @media (min-width: 768px) {
+    #song-list {
+      grid-template-columns: 1fr 1fr !important;
+      column-gap: 2.5rem !important;
+    }
+  }
+</style>
+
+<script define:vars={{ allSongs: songsData }}>
+  const PER_PAGE = 24;
+  let loadedCount = Math.min(PER_PAGE, allSongs.length);
+  const totalCount = allSongs.length;
+
+  const loadMoreBtn = document.getElementById('load-more-btn');
+  const songList = document.getElementById('song-list');
+  const badge = document.getElementById('song-count-badge');
+
+  loadMoreBtn?.addEventListener('click', () => {
+    const nextBatch = allSongs.slice(loadedCount, loadedCount + PER_PAGE);
+    const fragment = document.createDocumentFragment();
+
+    for (const song of nextBatch) {
+      const a = document.createElement('a');
+      a.href = `/song/${encodeURIComponent(song.slug)}/`;
+      a.className = 'song-row';
+      a.innerHTML = `<span class="song-title">${song.title}</span><span class="song-arrow" aria-hidden="true">→</span>`;
+      fragment.appendChild(a);
+    }
+    songList.appendChild(fragment);
+
+    loadedCount += nextBatch.length;
+
+    if (badge) {
+      badge.textContent = `Showing 1–${loadedCount} of ${totalCount}`;
+    }
+
+    if (loadedCount >= totalCount) {
+      loadMoreBtn.style.display = 'none';
+    }
+  });
+</script>

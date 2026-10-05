@@ -1,0 +1,29 @@
+---
+import Information from '../layouts/Information.astro';
+const contents = [{id:'content',label:'Songs and permissions'},{id:'attribution',label:'Attribution'},{id:'contributions',label:'Contributor responsibilities'},{id:'concerns',label:'Copyright concerns'},{id:'review',label:'Review and changes'}];
+---
+<Information title="Copyright / Content Policy" description="Song ownership, attribution, and the current handling of content concerns." policy contents={contents}>
+  <section id="content" aria-labelledby="content-heading"><h2 id="content-heading">Songs and permissions</h2>
+    <p>Keertana helps people discover lyrics, sing praise, and worship God. We do not claim copyright ownership of the songs or lyrics displayed here. All credit and applicable song rights belong to the respective authors, lyricists, composers, and rights holders.</p>
+    <p>The current collection does not record a license or verified copyright status for each song. Giving credit or including a song in this resource does not itself establish permission or mean that the work is public domain.</p>
+    <p>Check the permissions relevant to a song and your intended use before reproducing, adapting, distributing, publishing, or performing it. The site’s Copy and Share tools do not establish permission.</p>
+  </section>
+  <section id="attribution" aria-labelledby="attribution-heading"><h2 id="attribution-heading">Attribution</h2>
+    <p>The current song entries have titles and lyrics, but no recorded author, composer, source, or contributor credits. Missing attribution is not a statement that no rights holder exists.</p>
+    <p>Known authors, composers, and reliable sources should be identified when preparing contributions or corrections. A contributor and an author are different roles; providing a song does not establish authorship.</p>
+  </section>
+  <section id="contributions" aria-labelledby="contributions-heading"><h2 id="contributions-heading">Contributor responsibilities</h2>
+    <p>Only share material you are permitted to share. Provide source information when known, and clearly distinguish a reference for review from material you are authorized to contribute. Do not claim rights or licensing status without a reliable basis.</p>
+    <p>The contribution forms can prepare song lyrics, metadata, transliteration, and corrections, but they do not currently send or publish content. The site may contain contributed material if a submission process is later enabled; that is not an active receiving workflow today.</p>
+    <p>Checking a form does not transfer ownership or grant Keertana a license. Permissions and a review process will be established before submissions are enabled.</p>
+  </section>
+  <section id="concerns" aria-labelledby="concerns-heading"><h2 id="concerns-heading">Copyright concerns</h2>
+    <p>If you believe a song raises a rights or content concern, you can <a href="/contribute/report/?issue=copyright">prepare a copyright / content report</a>. Select the song, describe the concern, and include any source or rights-holder information you want considered. An optional email field is available for contact details.</p>
+    <p><strong>The report form cannot send a concern yet.</strong> It does not create a received notice or a legal takedown request.</p>
+    <p>This is a simple preparation route, not a jurisdiction-specific legal notice procedure. Do not include sensitive identification documents in the form.</p>
+  </section>
+  <section id="review" aria-labelledby="review-heading"><h2 id="review-heading">Review and changes</h2>
+    <p>Content concerns may call for checking sources, correcting attribution or lyrics, restricting access, or removing an entry. Such changes currently require maintaining the project’s collection; there is no automatic copyright detection or moderation dashboard.</p>
+    <p>No response deadline or particular outcome is promised while a receiving channel is unavailable. This page will be updated when contact details, contribution handling, or content-review procedures change.</p>
+  </section>
+</Information>

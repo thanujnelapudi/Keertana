@@ -1,0 +1,55 @@
+---
+import Information from '../layouts/Information.astro';
+const contents = [
+  {id:'information',label:'Information and forms'}, {id:'use',label:'How information is used'},
+  {id:'storage',label:'Cookies and browser storage'}, {id:'services',label:'Services and external links'},
+  {id:'retention',label:'Retention and your choices'}, {id:'security',label:'Security'},
+  {id:'changes',label:'Changes'}, {id:'contact',label:'Privacy questions'},
+];
+---
+<Information title="Privacy Policy" description="What the current Keertana site does with form details, browser storage, and requests to external services." policy contents={contents}>
+  <section id="information" aria-labelledby="information-heading"><h2 id="information-heading">Information and forms</h2>
+    <p>You can browse Keertana without an account. There is no account database, login, payment system, analytics script, advertising integration, or external error-reporting service configured in the application.</p>
+    <p>Contribution forms ask for the following details:</p>
+    <ul>
+      <li><strong>Submit a Song:</strong> title, language, lyrics, and an acknowledgement; optional Roman title, alternate title, author/composer, source/reference, category, notes, contributor name, and email.</li>
+      <li><strong>Report an Error:</strong> the selected song, issue type, and description; optional suggested correction, contributor name, and email. Reports opened from a song include its title, identifier, and language.</li>
+      <li><strong>Join the Team:</strong> name, email, and interests; optional skills/experience, motivation, and portfolio, GitHub, or website link.</li>
+    </ul>
+    <p><strong>These forms currently check details in your browser only.</strong> They do not send information to Keertana, write it to local storage, or store it in a server database. A browser may restore field values or supply autofill according to its own settings.</p>
+    <p>Opening a page makes a request to the server delivering it. Technical request information can include your IP address, browser information, requested address, and time of access. The production host’s settings and retention need owner confirmation.</p>
+  </section>
+  <section id="use" aria-labelledby="use-heading"><h2 id="use-heading">How information is used</h2>
+    <p>Form details are used locally to check required fields and formats. Keertana does not currently receive them for review or follow-up. There is no form provider connected.</p>
+    <p>Browser storage supports returning to saved or recent songs and remembering display preferences. Search matches titles against an index downloaded from this site. Typed search terms are processed in the browser; the current search interface does not send them to an external search service or save them as search history.</p>
+    <p>Copying lyrics writes them to your clipboard when you choose Copy. Sharing uses your device’s share feature, where available, or copies the song URL. The destination you choose may handle the shared information under its own practices.</p>
+  </section>
+  <section id="storage" aria-labelledby="storage-heading"><h2 id="storage-heading">Cookies and browser storage</h2>
+    <p>Cookies use the browser’s cookie mechanism and can accompany requests to a website. Local storage is a separate browser store; Keertana’s saved library is not a cookie and is not automatically sent with page requests.</p>
+    <p>No cookie-setting code or app-configured essential, analytics, advertising, or authentication cookies were found in this version. This does not verify cookies that a deployed host or its protection settings might add. No cookie banner has been added solely for local storage.</p>
+    <dl class="information-storage">
+      <div><dt>Saved Songs and Recently Viewed</dt><dd>Local storage keeps song identifiers in this browser. Saved songs remain until removed or cleared. Recent visits are deduplicated, ordered with the newest first, and limited to eight; older entries are replaced. Lyrics and contributor details are not copied into this store. There is no account-based synchronization.</dd></div>
+      <div><dt>Display preferences</dt><dd>Local storage remembers a chosen light/dark theme and lyric font size. These are preferences for this browser, not a user profile.</dd></div>
+      <div><dt>Offline cache</dt><dd>A service worker uses browser Cache Storage for the home and offline pages, search index, and visited same-site pages and resources. Cached pages can remain available offline and may briefly show an older version while refreshing. This is separate from cookies and local storage.</dd></div>
+    </dl>
+  </section>
+  <section id="services" aria-labelledby="services-heading"><h2 id="services-heading">Services and external links</h2>
+    <p>The Latin font, Inter, is requested from Google Fonts. These requests connect to Google’s font servers and expose your IP address and request information needed to deliver the font. See <a href="https://fonts.googleblog.com/2022/11/your-privacy-and-google-fonts.html" rel="external">Google’s font-service privacy explanation</a>. Telugu and Devanagari fonts are bundled with Keertana and served with the site.</p>
+    <p>The project’s default public address is on Vercel, but the active production hosting settings and enabled services have not been verified. If delivered through Vercel, that provider handles request information under its <a href="https://vercel.com/legal/privacy-notice" rel="external">Privacy Notice</a>. The owner must confirm the actual provider, logs, retention, and any dashboard-enabled analytics or protection before launch.</p>
+    <p>No embedded media, external song API, advertising service, or analytics integration is configured in the audited application. An external policy or other website link takes you to a service with its own privacy practices.</p>
+  </section>
+  <section id="retention" aria-labelledby="retention-heading"><h2 id="retention-heading">Retention and your choices</h2>
+    <p>Local storage has no expiry set by Keertana. It remains until cleared by you or your browser, replaced, or removed by the application. You can remove an individual saved song with its Saved button. Clear Keertana’s site data in browser settings to remove the saved library, recent visits, preferences, and offline cache; this also removes offline availability until resources are downloaded again.</p>
+    <p>Browser storage belongs to a browser profile and site address. Different devices, browsers, or addresses do not share it. Private browsing and storage restrictions may limit persistence. Other people using the same browser profile may see its saved and recent songs.</p>
+    <p>There is no server-side contribution retention period to state while forms are unconnected. Do not rely on a form as a saved draft: navigating away can discard it. Hosting and font-service retention are not controlled by these local storage settings and require provider/owner review.</p>
+  </section>
+  <section id="security" aria-labelledby="security-heading"><h2 id="security-heading">Security</h2>
+    <p>No website or browser store can promise absolute security. Avoid entering passwords, financial details, or other sensitive information in contribution fields. This version has no server-side submission store or deletion portal. Adding a receiver will require reviewing how information is secured, accessed, and retained before enabling it.</p>
+  </section>
+  <section id="changes" aria-labelledby="changes-heading"><h2 id="changes-heading">Changes to this page</h2>
+    <p>This page will be updated when the site's services or data practices change. The date above identifies the last update; it does not certify legal compliance.</p>
+  </section>
+  <section id="contact" aria-labelledby="contact-heading"><h2 id="contact-heading">Privacy questions</h2>
+    <p>The <a href="/contact/">Contact page</a> lists the available contribution options. Those forms check details locally and cannot deliver a privacy request.</p>
+  </section>
+</Information>
