@@ -6,8 +6,8 @@ interface Props { kind: 'submit' | 'report' | 'join'; }
 const { kind } = Astro.props;
 const catalog = kind === 'report' ? songs.map(song => { const { langId, langLabel } = detectSongLanguage(song); return { slug: song.slug, title: song.title, langId, langLabel }; }).sort((a, b) => a.title.localeCompare(b.title)) : [];
 ---
-<p class="contribution-notice"><strong>Sending is not available yet.</strong> You can prepare and check your details below. Nothing will be sent or saved; keep your own copy before leaving this page.</p>
-<noscript><p class="contribution-notice">JavaScript is needed to check these forms. Sending is not connected.</p></noscript>
+<p class="contribution-notice"><strong>Send by email.</strong> Check your details below, then open a prepared email to keertanasongs@gmail.com. Review it and press Send in your email app. Keertana does not send or save the form automatically.</p>
+<noscript><p class="contribution-notice">JavaScript is needed to prepare these forms. You can email <a href="mailto:keertanasongs@gmail.com">keertanasongs@gmail.com</a> directly.</p></noscript>
 <form class="contribution-form" data-kind={kind}>
   <p class="contribution-required-note">Fields marked * are required.</p>
   <p id="form-status" class="contribution-status" role="status" aria-live="polite" tabindex="-1" hidden></p>
@@ -29,7 +29,7 @@ const catalog = kind === 'report' ? songs.map(song => { const { langId, langLabe
   </>}
   {kind === 'report' && <>
     <div class="contribution-field"><label for="song">Song <span aria-hidden="true">*</span></label><select id="song" name="song" required aria-describedby="song-error song-help"><option value="">Choose a song</option>{catalog.map(song => <option value={song.slug} data-title={song.title} data-language={song.langId} data-label={song.langLabel}>{song.title} — {song.langLabel}</option>)}</select><p id="song-help" class="contribution-help">You can also open this form from a song’s Report an Error link.</p><p id="song-context" class="contribution-context" hidden></p><p id="song-error" class="contribution-error" hidden></p></div>
-    <div class="contribution-field"><label for="issue">Issue type <span aria-hidden="true">*</span></label><select id="issue" name="issue" required aria-describedby="issue-error issue-help"><option value="">Choose an issue type</option>{ISSUE_TYPES.map(issue => <option value={issue}>{issue}</option>)}</select><p id="issue-help" class="contribution-help" hidden>For a copyright or content concern, include the relevant source and rights-holder information in your description. This prepares a report only; sending is not available.</p><p id="issue-error" class="contribution-error" hidden></p></div>
+    <div class="contribution-field"><label for="issue">Issue type <span aria-hidden="true">*</span></label><select id="issue" name="issue" required aria-describedby="issue-error issue-help"><option value="">Choose an issue type</option>{ISSUE_TYPES.map(issue => <option value={issue}>{issue}</option>)}</select><p id="issue-help" class="contribution-help" hidden>For a copyright or content concern, include the relevant source and rights-holder information in your description. Review and send the prepared email from your email app.</p><p id="issue-error" class="contribution-error" hidden></p></div>
     <Field name="description" label="What needs correcting?" required multiline placeholder="Describe the issue and where it occurs in the song." />
     <Field name="correction" label="Suggested correction" multiline placeholder={'Current text:\n\nSuggested text:'} />
     <Field name="name" label="Contributor name" autocomplete="name" />
@@ -43,17 +43,41 @@ const catalog = kind === 'report' ? songs.map(song => { const { langId, langLabe
     <Field name="motivation" label="Why would you like to contribute?" multiline />
     <Field name="portfolio" label="Portfolio / GitHub / website" type="url" placeholder="https://" />
   </>}
-  <button type="submit" class="contribution-button" disabled>Check details</button>
+  <button type="submit" class="contribution-button" disabled>Prepare email</button>
+  <section id="email-draft" class="contribution-email" aria-labelledby="email-draft-heading" hidden>
+    <h2 id="email-draft-heading">Your email is ready</h2>
+    <p id="email-instructions"></p>
+    <a id="open-email" class="contribution-button" href="mailto:keertanasongs@gmail.com">Open email app</a>
+    <button id="copy-email" type="button" class="contribution-button">Copy email text</button>
+    <p>Email: <a href="mailto:keertanasongs@gmail.com">keertanasongs@gmail.com</a></p>
+    <label for="email-text">Prepared message — you can also select and copy this text</label>
+    <textarea id="email-text" readonly rows="8"></textarea>
+    <p>Nothing has been sent yet. If no email app opens, paste this message into your webmail and send it to the address above. Emailing does not guarantee publication or a response time.</p>
+  </section>
 </form>
 <p class="contribution-help"><a href="/privacy/#information" class="contribution-link">How these forms handle your details</a></p>
 <script>
-  import { sendContribution, validateContribution } from '../lib/contribution.mjs';
+  import { validateContribution } from '../lib/contribution.mjs';
+  import { prepareContributionEmail } from '../lib/contribution-email.mjs';
   const form = document.querySelector<HTMLFormElement>('.contribution-form');
   if (form) {
-    // Do not let an unconnected form navigate or leak details into a URL.
+    // Keep form values out of page URLs; email handoff requires an explicit link click.
     form.noValidate = true;
     const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
     const status = form.querySelector<HTMLElement>('#form-status')!;
+    const draft = form.querySelector<HTMLElement>('#email-draft')!;
+    const emailText = form.querySelector<HTMLTextAreaElement>('#email-text')!;
+    const openEmail = form.querySelector<HTMLAnchorElement>('#open-email')!;
+    form.querySelector<HTMLButtonElement>('#copy-email')!.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(emailText.value);
+        status.textContent = 'Email text copied. Paste it into your email app and send it to keertanasongs@gmail.com. Nothing has been sent by this site.';
+      } catch {
+        emailText.focus(); emailText.select();
+        status.textContent = 'Automatic copying is unavailable. Select and copy the prepared message below, then paste it into your email app.';
+      }
+      status.hidden = false;
+    });
     const kind = form.dataset.kind!;
     const song = form.querySelector<HTMLSelectElement>('#song');
     const language = form.querySelector<HTMLSelectElement>('#language');
@@ -93,13 +117,15 @@ const catalog = kind === 'report' ? songs.map(song => { const { langId, langLabe
       form!.querySelectorAll('[aria-invalid]').forEach(control => control.removeAttribute('aria-invalid'));
     }
     // A completion message describes the checked draft, not later edits.
-    form.addEventListener('input', () => { status.hidden = true; });
-    form.addEventListener('change', () => { status.hidden = true; });
+    const clearDraft = () => { status.hidden = true; draft.hidden = true; emailText.value = ''; openEmail.href = 'mailto:keertanasongs@gmail.com'; };
+    form.addEventListener('input', clearDraft);
+    form.addEventListener('change', clearDraft);
     form.addEventListener('submit', async event => {
       event.preventDefault();
       if (button.disabled) return;
       clearErrors();
       status.hidden = true;
+      draft.hidden = true;
       const data = new FormData(form);
       const values: Record<string, FormDataEntryValue | FormDataEntryValue[]> = Object.fromEntries(data.entries());
       if (kind === 'join') values.interests = data.getAll('interests');
@@ -128,27 +154,26 @@ const catalog = kind === 'report' ? songs.map(song => { const { langId, langLabe
       button.textContent = 'Checking…';
       form.setAttribute('aria-busy', 'true');
       try {
-        const result = await sendContribution({ kind, ...values, ...(song ? { songTitle: selectedSong()?.dataset.title, language: selectedSong()?.dataset.language } : {}) });
-        // Only an explicitly confirmed receipt from a future receiver may show success.
-        if (result.status === 'received' && result.receipt?.trim()) {
-          const thanks = { submit: 'Thank you for helping grow Keertana.', report: 'Thank you for helping keep Keertana accurate.', join: 'Thank you for your interest in helping Keertana.' };
-          status.textContent = `${thanks[kind as keyof typeof thanks]} Your contribution has been received.`;
-          form.reset();
-          updateContext();
-        } else if (result.status === 'unavailable') {
-          status.textContent = 'Your details are ready. Sending is not connected yet, so nothing has been submitted or saved. Your entries remain here; keep your own copy before leaving.';
-        } else { throw new Error('Unconfirmed receipt'); }
+        const email = prepareContributionEmail(kind, { ...values, ...(song ? { songTitle: selectedSong()?.dataset.title, language: selectedSong()?.dataset.language } : {}) }, location.origin);
+        emailText.value = `${email.subject}\n\n${email.body}`;
+        openEmail.href = email.href;
+        form.querySelector<HTMLElement>('#email-instructions')!.textContent = email.requiresCopy
+          ? 'This message is long. Copy the email text first, then open your email app and paste it into the message body.'
+          : 'Open your email app to review the recipient, subject and message, then press Send yourself.';
+        draft.hidden = false;
+        status.textContent = 'Your email draft is ready below. Nothing has been sent or saved by Keertana.';
       } catch {
-        status.textContent = 'We couldn’t send this right now. Your entries remain here. Please try again once sending is available.';
+        status.textContent = 'We couldn’t prepare the email. Your entries remain here. You can copy them and email keertanasongs@gmail.com directly.';
       } finally {
         form.removeAttribute('aria-busy');
         button.disabled = false;
-        button.textContent = 'Check details';
+        button.textContent = 'Prepare email';
         status.hidden = false;
         status.focus();
       }
     });
     button.disabled = false;
-    window.addEventListener('pageshow', () => { button.disabled = false; button.textContent = 'Check details'; form.removeAttribute('aria-busy'); });
+    window.addEventListener('pageshow', () => { button.disabled = false; button.textContent = 'Prepare email'; form.removeAttribute('aria-busy'); });
   }
 </script>
+

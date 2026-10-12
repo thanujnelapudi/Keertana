@@ -10,7 +10,7 @@ const policies = [{ href: '/privacy/', label: 'Privacy' }, { href: '/terms/', la
     <nav class="information-breadcrumb" aria-label="Breadcrumb"><ol><li><a href="/">Keertana</a></li><li aria-hidden="true">/</li><li aria-current="page">{breadcrumb}</li></ol></nav>
     <header class="information-intro"><h1>{title}</h1><p>{description}</p></header>
     {policy && <>
-      <p class="information-updated">Last updated: <time datetime="2026-10-05">5 October 2026</time></p>
+      <p class="information-updated">Last updated: <time datetime="2026-10-12">12 October 2026</time></p>
       <p class="information-draft"><strong>About these policies.</strong> Keertana is a worship-song resource based in India. These policies describe the current service and do not certify legal compliance.</p>
     </>}
     {contents.length > 0 && <nav class="information-contents" aria-label="On this page"><h2>On this page</h2><ul>{contents.map(section => <li><a href={`#${section.id}`}>{section.label}</a></li>)}</ul></nav>}

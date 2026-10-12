@@ -35,6 +35,10 @@
 .contribution-button:hover { background: var(--accent-hover); }
 .contribution-button:disabled { opacity: .6; cursor: wait; }
 .contribution-status { border-left: 3px solid var(--accent); background: var(--surface-subtle); padding: 1rem; margin: 0; overflow-wrap: anywhere; }
+.contribution-email { border-top: 1px solid var(--border); padding-top: 1.5rem; display: grid; gap: 1rem; min-width: 0; overflow-wrap: anywhere; }
+.contribution-email[hidden] { display: none; }
+.contribution-email h2, .contribution-email p { margin: 0; }
+.contribution-email textarea { width: 100%; padding: .75rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; }
 .contribution-related { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: .875rem; color: var(--text-muted); }
 .contribution-context { margin: .75rem 0 0; font-size: .875rem; color: var(--text-muted); overflow-wrap: anywhere; }
 .contribution-page :is(input, select, textarea, button, summary, a):focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }

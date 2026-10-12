@@ -24,4 +24,4 @@ Set `SITE_URL` to the final primary HTTPS address before the production build. I
 
 ## Current contribution status
 
-Submit, Report and Join forms validate details locally. They do not send or store submissions; no receiver or CMS is connected. Saved/recent songs and reading preferences are local to the browser. See the policy pages and `docs/` for current behavior and implementation notes.
+Submit, Report and Join forms validate details locally and prepare email drafts to keertanasongs@gmail.com. Visitors review and send through their email app. Long messages can be copied into webmail; the site never claims automatic sending or receipt. No CMS or site-side submission database is connected. Saved/recent songs and reading preferences are local to the browser. See the policy pages and `docs/` for current behavior and implementation notes.
