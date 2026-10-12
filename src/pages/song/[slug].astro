@@ -154,6 +154,7 @@ const romanizedLyrics = getRomanizedLyrics(song.lyrics);
         </div>
       </div>
       <p id="reader-status" role="status" aria-live="polite" class="reader-status"></p>
+      <a href={`/setlists/?add=${encodeURIComponent(song.slug)}`} class="saved-songs-access">+ Add to a worship setlist →</a>
       <a id="saved-songs-access" href="/#saved-songs" class="saved-songs-access" hidden>View Saved Songs →</a>
     </header>
 

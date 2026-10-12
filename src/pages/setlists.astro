@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import '../styles/setlists.css';
+---
+<Base title="Your Worship Setlists | Keertana" description="Arrange songs for worship, read them in order, and print your lyrics." noindex>
+  <div class="container-page setlist-page">
+    <header class="setlist-intro">
+      <p class="setlist-eyebrow">PREPARE · SING · WORSHIP</p>
+      <h1>A little order.<br />More room for worship.</h1>
+      <p>Bring your songs together, in the order you’ll sing them.</p>
+      <p class="setlist-note">Kept in this browser. No account needed. Clearing browser data removes your lists.</p>
+    </header>
+    <noscript>Enable JavaScript to create and use your local setlists.</noscript>
+    <p id="setlist-status" role="status" aria-live="polite">Loading your workspace…</p>
+    <div class="setlist-workspace" id="setlist-workspace" hidden>
+      <aside class="setlist-sidebar" aria-label="Your setlists">
+        <h2>Your setlists</h2>
+        <form id="create-setlist"><label for="setlist-name">New setlist name</label><input id="setlist-name" maxlength="80" required placeholder="Sunday worship" /><button type="submit" class="setlist-primary">Create setlist</button></form>
+        <ul id="setlist-tabs"></ul>
+        <button id="backup-setlists" type="button">Download backup</button>
+      </aside>
+      <section class="setlist-editor" aria-label="Setlist editor">
+        <div id="setlist-empty"><h2>Start with a song. Make it a gathering.</h2><p>Create your first setlist to arrange songs from any language together.</p></div>
+        <div id="setlist-detail" hidden>
+          <div class="setlist-heading"><h2 id="active-setlist-name"></h2><span id="setlist-count"></span></div>
+          <form id="rename-setlist" class="setlist-inline"><label for="rename-name">Setlist name</label><input id="rename-name" maxlength="80" required /><button type="submit">Rename</button></form>
+          <div class="setlist-actions"><button id="read-setlist" type="button">Read in order</button><button id="print-setlist" type="button">Print lyrics</button><button id="delete-setlist" type="button">Delete setlist</button></div>
+          <p class="setlist-note">Use ↑ and ↓ to arrange songs. Changes save immediately.</p>
+          <ol id="setlist-songs"></ol>
+          <section class="setlist-picker" aria-label="Find songs to add">
+            <h3>Add your next song</h3><label for="setlist-search">Search by title or Roman spelling</label><input id="setlist-search" type="search" placeholder="Try Amazing Grace or a transliterated title" autocomplete="off" />
+            <button type="button" id="pick-saved">Browse Saved Songs</button>
+            <p id="setlist-search-status" role="status"></p><ul id="setlist-results"></ul>
+          </section>
+        </div>
+      </section>
+    </div>
+    <section id="setlist-reading" hidden aria-label="Setlist lyrics"><button id="close-setlist-reading" type="button">← Back to arranging</button><div id="setlist-lyrics"></div></section>
+  </div>
+  <script src="../scripts/setlist-workspace.js"></script>
+</Base>

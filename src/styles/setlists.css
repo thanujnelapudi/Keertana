@@ -1,0 +1,47 @@
+.setlist-page { padding-block: 3rem; max-width: 1120px; }
+.setlist-intro { max-width: 680px; margin-bottom: 2rem; }
+.setlist-eyebrow { font-size: .75rem; letter-spacing: .15em; color: var(--accent); }
+.setlist-intro h1 { font-size: clamp(2rem, 5vw, 3.25rem); line-height: 1.2; letter-spacing: -.035em; margin-block: .8rem 1rem; }
+.setlist-note, .setlist-credit, #setlist-count { color: var(--text-muted); font-size: .85rem; line-height: 1.7; }
+#setlist-status { min-height: 1.8rem; color: var(--accent); overflow-wrap: anywhere; }
+.setlist-workspace { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 2rem; }
+.setlist-page [hidden] { display: none !important; }
+.setlist-sidebar, .setlist-editor { padding: 1.5rem; border: 1px solid var(--border); background: var(--surface); border-radius: 16px; min-width: 0; }
+.setlist-page h2 { font-size: 1.3rem; font-weight: 600; margin-bottom: 1rem; overflow-wrap: anywhere; }
+.setlist-page h3 { font-size: 1.1rem; margin-bottom: .75rem; }
+.setlist-page label { display: block; font-size: .85rem; color: var(--text-muted); margin-bottom: .4rem; }
+.setlist-page input { width: 100%; min-width: 0; border: 1px solid var(--border); border-radius: 8px; padding: .8rem; color: var(--text); background: var(--bg); margin-bottom: .65rem; }
+.setlist-page button { min-height: 44px; padding: .55rem .8rem; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; cursor: pointer; font-size: .85rem; transition: background .15s, color .15s; }
+.setlist-page button:hover:not(:disabled), #setlist-tabs button[aria-pressed=true] { background: var(--accent-bg); color: var(--accent); border-color: var(--accent); }
+.setlist-page button:disabled { opacity: .5; cursor: default; }
+.setlist-page .setlist-primary { background: var(--accent); color: white; width: 100%; }
+.setlist-page ul, #setlist-songs { padding: 0; list-style: none; }
+#setlist-tabs { margin-block: 1.5rem; display: grid; gap: .5rem; }
+#setlist-tabs button { width: 100%; text-align: left; overflow-wrap: anywhere; }
+.setlist-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.setlist-inline { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
+.setlist-inline label { width: 100%; }
+.setlist-inline input { flex: 1; margin: 0; }
+.setlist-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
+#setlist-songs li, #setlist-results li { display: flex; align-items: center; gap: .6rem; border-bottom: 1px solid var(--border); padding-block: .85rem; }
+.setlist-song-title { flex: 1; min-width: 0; overflow-wrap: anywhere; line-height: 1.7; }
+.setlist-position { font-size: .75rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+.setlist-row-actions { display: flex; gap: .3rem; }
+.setlist-picker { border-top: 1px solid var(--border); margin-top: 2rem; padding-top: 1.5rem; }
+#setlist-search-status { font-size: .85rem; color: var(--text-muted); }
+#setlist-reading { max-width: 760px; margin-inline: auto; }
+.setlist-print-song { padding-block: 2rem; border-bottom: 1px solid var(--border); }
+.setlist-full-lyrics { white-space: pre-wrap; line-height: 1.9; font-size: 1.1rem; }
+@media (max-width: 760px) { .setlist-workspace { grid-template-columns: 1fr; gap: 1rem; } .setlist-page { padding-block: 2rem; } .setlist-sidebar, .setlist-editor { padding: 1rem; } #setlist-songs li { flex-wrap: wrap; } .setlist-row-actions { margin-left: auto; } }
+@media print {
+  @page { margin: 16mm; }
+  .site-header, .site-footer, .setlist-intro, #setlist-status, .setlist-workspace, #close-setlist-reading, astro-dev-toolbar { display: none !important; }
+  html, body, .setlist-page { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; max-width: none !important; }
+  #setlist-reading { max-width: none; }
+  #setlist-lyrics > h1 { font-size: 20pt; }
+  .setlist-print-song { border: 0; padding: 0; break-before: page; }
+  .setlist-print-song:first-of-type { break-before: auto; }
+  .setlist-print-song h2 { font-size: 18pt; break-after: avoid; }
+  .setlist-full-lyrics { font-size: 12pt; orphans: 3; widows: 3; }
+  .setlist-credit { color: black; font-size: 9pt; margin-top: 8mm; }
+}
