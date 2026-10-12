@@ -21,7 +21,8 @@ const server = http.createServer(async (req, res) => {
       return res.end(page);
     }
     if (req.method !== 'POST' || !['/preview', '/add'].includes(req.url)) return reply(404, { error: 'Not found' });
-    if (req.headers.origin !== origin || req.headers['x-entry-token'] !== token || !req.headers['content-type']?.startsWith('application/json')) return reply(403, { error: 'This action must come from the local tool.' });
+    if (req.headers.origin !== origin || !req.headers['content-type']?.startsWith('application/json')) return reply(403, { error: 'Open the local address printed by npm run song-entry.' });
+    if (req.headers['x-entry-token'] !== token) return reply(403, { error: 'This tool session has expired. Keep a copy of your text, then reopen the address printed by npm run song-entry.' });
     const chunks = []; let bytes = 0;
     for await (const chunk of req) { bytes += chunk.length; if (bytes > 600000) return reply(413, { error: 'The entry is too large.' }); chunks.push(chunk); }
     const input = JSON.parse(Buffer.concat(chunks).toString());
