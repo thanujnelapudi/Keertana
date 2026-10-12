@@ -6,7 +6,21 @@ Song credit and applicable rights belong to the respective creators and rights h
 
 ## Local development
 
+Use Node.js 22.18 or newer (Node 24 is recommended). The project uses Astro 7.
+
 Install dependencies with `npm ci`, then run `npm run dev -- --host 127.0.0.1` and open http://127.0.0.1:4321/.
+
+## Add a song locally
+
+Run `npm run song-entry` and open the local address printed in the terminal. Enter a title and lyrics, leave the slug blank to generate one or enter your own, then select Preview and check. Review the Roman spelling and verse spacing. Matching slugs, titles and lyrics prevent accidental duplicates. When ready, select Add song to local catalog.
+
+The tool appends the entry to `src/data/songs.json` and creates an original-catalog backup in `.song-backups/`. It runs only on 127.0.0.1, outside the deployed site. Anyone using your Windows session can access it while running; it is not a public authenticated admin panel. Stop it with Ctrl+C. It does not push or deploy changes.
+
+After adding, run `npm run build` and `node scripts/audit-song-seo.mjs dist`, review the song, then commit and push when ready. The normal static build creates its song page and updates collections, search and the sitemap. Restore from a catalog backup only after stopping the tool and preserving any newer changes.
+
+## Print lyrics
+
+Each song has a Print button that opens the browser print dialog. The print layout retains the title, lyrics, verse spacing and a credit notice, with navigation and actions hidden. Use the dialog's Save as PDF option if desired. Printed browser headers/footers, paper size and margins are controlled by the visitor's print settings.
 
 ## Production build
 

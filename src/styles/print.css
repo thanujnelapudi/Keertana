@@ -1,0 +1,14 @@
+.print-attribution { display: none; }
+@media print {
+  @page { margin: 16mm; }
+  html, body { background: white !important; color: black !important; font-size: 12pt; }
+  .site-header, .site-footer, .song-detail > nav, .song-toolbar, .reader-status,
+  .saved-songs-access, .reader-bottom-nav, .sr-only, astro-dev-toolbar { display: none !important; }
+  .song-detail { width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
+  .song-detail > header { margin-bottom: 6mm !important; break-after: avoid; }
+  .reader-title { color: black !important; font-size: 22pt !important; line-height: 1.5 !important; margin: 0 !important; }
+  .reader-title::before, .reader-title::after, .lyrics-card::before, .lyrics-card::after { display: none !important; }
+  .lyrics-card { padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: white !important; box-shadow: none !important; }
+  #lyrics-body { color: black !important; font-size: 12pt !important; line-height: 1.8 !important; white-space: pre-wrap !important; overflow-wrap: anywhere; orphans: 3; widows: 3; }
+  .print-attribution { display: block; color: black; font-size: 9pt; margin-top: 8mm; }
+}

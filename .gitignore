@@ -9,6 +9,11 @@
 /.audit-originals/
 /[{]src/
 /songs.backup.json
+/.song-backups/
+/src/data/songs.json.entry-lock
+/src/data/songs.json.*.tmp
+/.dependency-*.json
+/.astro5-versions.json
 /*.png
 *.log
 
