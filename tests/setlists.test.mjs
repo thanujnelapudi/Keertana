@@ -1,7 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readSetlists, changeSetlist, SETLIST_KEY } from '../public/setlists.js';
+import { readSetlists, changeSetlist, SETLIST_KEY, encodeSharedSetlist, decodeSharedSetlist } from '../public/setlists.js';
 const storage = () => { const m = new Map(); return { getItem: k => m.get(k) ?? null, setItem: (k, v) => m.set(k, v) }; };
+test('shared links preserve multilingual names and order without writing local lists', () => {
+  const list = { name: 'ఆరాధన · रविवार 🙏', songs: ['deevinchaave', 'amazing-grace'] };
+  const url = new URL('https://keertana.vercel.app/setlists/'); url.hash = `set=${encodeSharedSetlist(list)}`;
+  assert.deepEqual(decodeSharedSetlist(url.hash.slice(5)), { id: 'shared', ...list });
+  list.songs.reverse();
+  assert.deepEqual(decodeSharedSetlist(url.hash.slice(5)).songs, ['deevinchaave', 'amazing-grace']);
+  for (const bad of ['broken%', encodeURIComponent(JSON.stringify({ version: 1, name: 'Test', songs: ['../bad'] })), encodeURIComponent(JSON.stringify({ version: 1, name: 'Test', songs: ['a', 'a'] }))]) assert.throws(() => decodeSharedSetlist(bad));
+  assert.throws(() => decodeSharedSetlist('x'.repeat(16001)));
+});
 test('ordered setlists preserve saved songs and survive reloads', () => {
   const s = storage(); s.setItem('keertana-library-v1', 'existing data');
   changeSetlist(s, { type: 'create', id: 'one', name: 'Sunday' });

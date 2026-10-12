@@ -1,16 +1,17 @@
-import { readSetlists, changeSetlist, SETLIST_KEY } from '../../public/setlists.js';
+import { readSetlists, changeSetlist, SETLIST_KEY, encodeSharedSetlist, decodeSharedSetlist } from '../../public/setlists.js';
 import { readLibrary } from '../../public/local-library.js';
 import { searchTitles } from '../../public/title-search.js';
 const el = id => document.getElementById(id);
 const status = message => { el('setlist-status').textContent = message; };
 let lists = [], active = '', catalog = [], busy = false;
+let shared = null, deletingId = null;
 const pending = new URLSearchParams(location.search).get('add');
 const lang = g => ({ telugu: 'te', hindi: 'hi', english: 'en' }[g] || 'en');
 const node = (tag, text, className) => { const n = document.createElement(tag); n.textContent = text; if (className) n.className = className; return n; };
 function button(text, label, handler, disabled = false) {
   const b = node('button', text); b.type = 'button'; b.setAttribute('aria-label', label); b.disabled = disabled; b.addEventListener('click', handler); return b;
 }
-function selected() { return lists.find(x => x.id === active); }
+function selected() { return shared || lists.find(x => x.id === active); }
 function change(action, message, focusSlug) {
   try {
     lists = changeSetlist(localStorage, action);
@@ -22,6 +23,20 @@ function change(action, message, focusSlug) {
   } catch (error) { status(error.message || 'Could not save. Browser storage may be full or unavailable.'); return false; }
 }
 function render() {
+  el('delete-confirmation').hidden = true; deletingId = null;
+  el('share-link-panel').hidden = true;
+  if (shared) {
+    document.querySelector('.setlist-intro .setlist-note').textContent = 'Open the shared songs in order. No account needed.';
+    el('setlist-workspace').hidden = true; el('setlist-reading').hidden = true; el('shared-setlist').hidden = false;
+    el('shared-setlist-name').textContent = shared.name;
+    el('shared-setlist-songs').replaceChildren();
+    for (const [index, slug] of shared.songs.entries()) {
+      const song = catalog.find(x => x.s === slug), li = node('li', '');
+      const a = node(song ? 'a' : 'span', song?.t || `${slug} (unavailable)`, 'setlist-song-title'); a.lang = lang(song?.g);
+      if (song) a.href = `/song/${slug}/`; li.append(node('span', `${index + 1}. `, 'setlist-position'), a); el('shared-setlist-songs').append(li);
+    }
+    return;
+  }
   if (!selected()) active = lists[0]?.id || '';
   const list = selected();
   el('setlist-tabs').replaceChildren();
@@ -36,6 +51,7 @@ function render() {
   el('active-setlist-name').textContent = list.name; el('active-setlist-name').tabIndex = -1;
   el('rename-name').value = list.name; el('setlist-count').textContent = `${list.songs.length} song${list.songs.length === 1 ? '' : 's'}`;
   el('read-setlist').disabled = el('print-setlist').disabled = !list.songs.length || busy;
+  el('share-setlist').disabled = !list.songs.length;
   const ol = el('setlist-songs'); ol.replaceChildren();
   if (!list.songs.length) ol.append(node('li', 'Your setlist is ready for its first song.', 'setlist-note'));
   list.songs.forEach((slug, index) => {
@@ -71,7 +87,29 @@ function showResults() {
 }
 el('create-setlist').addEventListener('submit', event => { event.preventDefault(); if (change({ type: 'create', id: crypto.randomUUID(), name: el('setlist-name').value }, 'Setlist created. Choose your first song below.')) el('setlist-name').value = ''; });
 el('rename-setlist').addEventListener('submit', event => { event.preventDefault(); change({ type: 'rename', id: active, name: el('rename-name').value }, 'Setlist renamed.'); });
-el('delete-setlist').addEventListener('click', () => { if (confirm(`Delete “${selected().name}”? Your saved songs will remain.`)) { change({ type: 'delete', id: active }, 'Setlist deleted.'); el('setlist-name').focus(); } });
+el('delete-setlist').addEventListener('click', () => {
+  if (!selected()) return;
+  deletingId = active; el('delete-question').textContent = `Delete “${selected().name}”? Your saved songs will remain.`;
+  el('delete-confirmation').hidden = false; el('cancel-delete-setlist').focus();
+});
+el('cancel-delete-setlist').addEventListener('click', () => { deletingId = null; el('delete-confirmation').hidden = true; el('delete-setlist').focus(); });
+el('confirm-delete-setlist').addEventListener('click', () => { if (deletingId && change({ type: 'delete', id: deletingId }, 'Setlist deleted.')) el('setlist-name').focus(); });
+async function copyShareLink() {
+  try { await navigator.clipboard.writeText(el('setlist-share-link').value); status('Setlist link copied. Send it to your worship team.'); }
+  catch { el('setlist-share-link').focus(); el('setlist-share-link').select(); status('Select and copy the link above to share it.'); }
+}
+el('copy-setlist-link').addEventListener('click', copyShareLink);
+el('share-setlist').addEventListener('click', async () => {
+  try {
+    const list = selected(); const url = new URL(document.querySelector('link[rel="canonical"]').href);
+    url.hash = `set=${encodeSharedSetlist(list)}`;
+    el('setlist-share-link').value = url.href; el('share-link-panel').hidden = false;
+    if (navigator.share) {
+      try { await navigator.share({ title: `${list.name} · Keertana`, text: 'Our worship songs, in order.', url: url.href }); status('Setlist shared.'); }
+      catch (error) { if (error.name === 'AbortError') status('Sharing cancelled. Your link is still available below.'); else await copyShareLink(); }
+    } else await copyShareLink();
+  } catch (error) { status(error.message || 'Could not create a share link.'); }
+});
 el('setlist-search').addEventListener('input', () => { savedMode = false; showResults(); });
 el('pick-saved').addEventListener('click', () => { savedMode = true; showResults(); });
 el('backup-setlists').addEventListener('click', () => {
@@ -87,7 +125,7 @@ async function readSongs(print) {
       if (!response.ok) throw new Error(`Could not load ${catalog.find(x => x.s === slug)?.t || slug}. Check your connection and try again.`);
       const song = await response.json(); if (typeof song.lyrics !== 'string' || typeof song.title !== 'string') throw new Error('Unexpected song data. Please try again.'); songs.push(song);
     }
-    if (JSON.stringify(readSetlists(localStorage).find(x => x.id === list.id)) !== snapshot || active !== list.id) throw new Error('The setlist changed while loading. Please open it again.');
+    if (!shared && (JSON.stringify(readSetlists(localStorage).find(x => x.id === list.id)) !== snapshot || active !== list.id)) throw new Error('The setlist changed while loading. Please open it again.');
     const content = el('setlist-lyrics'); content.replaceChildren(node('h1', list.name));
     songs.forEach((song, index) => {
       const article = node('article', '', 'setlist-print-song'); const title = node('h2', `${index + 1}. ${song.title}`); title.lang = song.langCode;
@@ -95,19 +133,22 @@ async function readSongs(print) {
       article.append(title, lyrics, node('p', 'Keertana · Song credit and rights belong to the respective creators and rights holders.', 'setlist-credit')); content.append(article);
     });
     el('setlist-reading').hidden = false; el('setlist-workspace').hidden = true; status('Your songs are ready, in worship order.');
+    el('shared-setlist').hidden = true;
     el('close-setlist-reading').focus();
     if (print) { await document.fonts.ready; window.print(); }
   } catch (error) { status(error.message || 'Could not prepare lyrics. Please try again.'); }
   finally { busy = false; el('read-setlist').disabled = el('print-setlist').disabled = !selected()?.songs.length; }
 }
 el('read-setlist').addEventListener('click', () => readSongs(false)); el('print-setlist').addEventListener('click', () => readSongs(true));
-el('close-setlist-reading').addEventListener('click', () => { render(); el('read-setlist').focus(); });
+el('read-shared-setlist').addEventListener('click', () => readSongs(false)); el('print-shared-setlist').addEventListener('click', () => readSongs(true));
+el('close-setlist-reading').addEventListener('click', () => { render(); el(shared ? 'read-shared-setlist' : 'read-setlist').focus(); });
 async function initialize() {
   try {
-    lists = readSetlists(localStorage);
+    if (location.hash.startsWith('#set=')) shared = decodeSharedSetlist(location.hash.slice(5));
+    else lists = readSetlists(localStorage);
     const response = await fetch('/api/search-index.json'); if (!response.ok) throw new Error('Song catalog unavailable. Reload to try again.');
     catalog = await response.json(); if (!Array.isArray(catalog)) throw new Error('Song catalog unavailable. Reload to try again.');
-    render(); status(pending ? 'Choose or create a setlist, then add this song below.' : 'Your worship workspace is ready.');
+    render(); status(shared ? 'Your shared worship setlist is ready.' : pending ? 'Choose or create a setlist, then add this song below.' : 'Your worship workspace is ready.');
   } catch (error) { status(error.message || 'Browser storage is unavailable. Enable it and reload to use setlists.'); }
 }
 window.addEventListener('storage', event => { if (event.key === SETLIST_KEY || event.key === null) { try { lists = readSetlists(localStorage); render(); status('Setlists updated from another tab.'); } catch (error) { status(error.message); } } });

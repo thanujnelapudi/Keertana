@@ -1,5 +1,18 @@
 export const SETLIST_KEY = 'keertana-setlists-v1';
 const slugOK = s => typeof s === 'string' && /^[a-z0-9][a-z0-9-]*$/.test(s);
+export function encodeSharedSetlist(list) {
+  const payload = { version: 1, name: list.name, songs: list.songs };
+  const encoded = encodeURIComponent(JSON.stringify(payload));
+  if (encoded.length > 16000) throw new Error('This setlist is too large to share as a link. Try splitting it into smaller sets.');
+  return encoded;
+}
+export function decodeSharedSetlist(encoded) {
+  if (!encoded || encoded.length > 16000) throw new Error('This shared setlist link is invalid or too long.');
+  let data;
+  try { data = JSON.parse(decodeURIComponent(encoded)); } catch { throw new Error('This shared setlist link is damaged. Ask the sender for a new link.'); }
+  if (data?.version !== 1 || typeof data.name !== 'string' || !data.name.trim() || data.name.length > 80 || !Array.isArray(data.songs) || !data.songs.length || data.songs.length > 100 || !data.songs.every(slugOK) || new Set(data.songs).size !== data.songs.length) throw new Error('This shared setlist link is invalid.');
+  return { id: 'shared', name: data.name, songs: data.songs };
+}
 export function readSetlists(storage) {
   const raw = storage.getItem(SETLIST_KEY);
   if (!raw) return [];

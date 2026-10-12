@@ -28,6 +28,10 @@
 .setlist-position { font-size: .75rem; color: var(--accent); font-variant-numeric: tabular-nums; }
 .setlist-row-actions { display: flex; gap: .3rem; }
 .setlist-picker { border-top: 1px solid var(--border); margin-top: 2rem; padding-top: 1.5rem; }
+#delete-confirmation, #share-link-panel { padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-block: 1rem; }
+#shared-setlist { max-width: 760px; padding: 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; }
+#shared-setlist-songs { padding-left: 1.5rem; }
+#shared-setlist-songs li { padding: .75rem; border-bottom: 1px solid var(--border); }
 #setlist-search-status { font-size: .85rem; color: var(--text-muted); }
 #setlist-reading { max-width: 760px; margin-inline: auto; }
 .setlist-print-song { padding-block: 2rem; border-bottom: 1px solid var(--border); }
@@ -35,7 +39,7 @@
 @media (max-width: 760px) { .setlist-workspace { grid-template-columns: 1fr; gap: 1rem; } .setlist-page { padding-block: 2rem; } .setlist-sidebar, .setlist-editor { padding: 1rem; } #setlist-songs li { flex-wrap: wrap; } .setlist-row-actions { margin-left: auto; } }
 @media print {
   @page { margin: 16mm; }
-  .site-header, .site-footer, .setlist-intro, #setlist-status, .setlist-workspace, #close-setlist-reading, astro-dev-toolbar { display: none !important; }
+  .site-header, .site-footer, .setlist-intro, #setlist-status, .setlist-workspace, #shared-setlist, #close-setlist-reading, astro-dev-toolbar { display: none !important; }
   html, body, .setlist-page { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; max-width: none !important; }
   #setlist-reading { max-width: none; }
   #setlist-lyrics > h1 { font-size: 20pt; }
