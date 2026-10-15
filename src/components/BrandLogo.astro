@@ -5,4 +5,8 @@
   .brand-logo-frame { display: block; position: relative; width: 170px; height: 44px; flex-shrink: 0; overflow: hidden; }
   .brand-logo { position: absolute; width: 180px; height: 60px; max-width: none; left: -7px; top: -8px; }
   :global([data-theme="dark"]) .brand-logo { filter: brightness(0) invert(0.94); }
+  @media (max-width: 380px) {
+    :global(.site-header) .brand-logo-frame { width: 126px; height: 44px; }
+    :global(.site-header) .brand-logo { width: 134px; height: 45px; left: -5px; top: 0; }
+  }
 </style>

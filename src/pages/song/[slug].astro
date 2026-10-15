@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import '../../styles/print.css';
 import { songs, detectSongLanguage } from '../../lib/songs';
 import { getRomanizedLyrics } from '../../lib/transliterate';
+import { songSearchTitle } from '../../lib/song-seo';
 
 export function getStaticPaths() {
   return songs.map((song) => ({ params: { slug: song.slug }, props: { song } }));
@@ -19,8 +20,8 @@ const canonical = `${siteUrl}/song/${song.slug}/`;
 
 const lyricLines = song.lyrics.split('\n').map((l) => l.trim()).filter(Boolean);
 const cleanSnippet = lyricLines.slice(0, 2).join(' ').slice(0, 140);
-const title = `${song.title} – ${langInfo.langLabel} Christian Song Lyrics | Keertana`;
-const description = `Read ${song.title}, a ${langInfo.langLabel} Christian worship song, on Keertana. ${cleanSnippet}`;
+const { title, romanTitle } = songSearchTitle(song, langInfo.langLabel);
+const description = `Read ${song.title}${romanTitle ? ` (${romanTitle})` : ''}, a ${langInfo.langLabel} Christian worship song, on Keertana. ${cleanSnippet}`;
 
 const ogLocale = langInfo.langCode === 'te' ? 'te_IN' : langInfo.langCode === 'hi' ? 'hi_IN' : 'en_US';
 
@@ -29,6 +30,7 @@ const jsonLd = [
     '@context': 'https://schema.org',
     '@type': 'MusicComposition',
     name: song.title,
+    ...(romanTitle ? { alternateName: romanTitle } : {}),
     url: canonical,
     '@id': `${canonical}#song`,
     inLanguage: langInfo.langCode,
@@ -81,6 +83,7 @@ const romanizedLyrics = getRomanizedLyrics(song.lyrics);
         color: var(--text);
         margin: 0 0 1.25rem;
       ">{song.title}</h1>
+      {romanTitle && <p class="reader-title-alias" lang="en">{romanTitle} · {langInfo.langLabel} lyrics</p>}
 
       <!-- Toolbar: Font size controls + Copy + Share -->
       <div class="song-toolbar" style="
@@ -235,6 +238,7 @@ const romanizedLyrics = getRomanizedLyrics(song.lyrics);
 </script>
 
 <style>
+  .reader-title-alias { margin: -0.5rem 0 1.25rem; color: var(--text-muted); font-size: 0.9375rem; overflow-wrap: anywhere; }
   .reader-status { min-height: 1.5em; margin: 0.375rem 0 0; color: var(--text-muted); font-size: 0.8125rem; }
   .saved-songs-access { display: inline-block; padding: 0.5rem 0; font-size: 0.8125rem; color: var(--accent); }
   .saved-songs-access[hidden] { display: none; }
