@@ -14,14 +14,30 @@
 
 Eight reported URLs have a catalog destination: `naaku-nee-krupa-chaalunu`, `praaneshwara`, `enni-tharamulu-sthuthiyinchinaa`, `athyunnatha-simhasanamupai` (explicit alias), `naaku-jeevamai-unna`, `kavulakainaa-saadhyamaa`, `prathigaa-yesu-yesu`, and `kalalaa-unnadi`.
 
-Four reported URLs remain without a verified destination:
+Three reported song URLs remain without a verified destination:
 
 - `/songs/sugunala-sampannuda`
 - `/songs/sugunala-sampannuda/`
 - `/songs/nee-krupa-odiponivvadhu/`
-- `/artists`
+
+The owner explicitly retired `/artists`; it is not a restoration task. Keep its genuine 404 response rather than redirecting to unrelated content. Its continued appearance in an old Search Console report does not require rebuilding an artists page.
 
 The generic prefix migration does not restore missing songs: absent destinations still return 404. Do not redirect these to unrelated songs or the homepage. Restore approved song content or establish a verified equivalent before adding specific redirects. Do not claim that the entire 404 report has been fixed.
+
+### Recovery investigation
+
+Checked the current catalog, `songs.backup.json`, the local song-entry backup, full workspace text matches, and all available Git history for `src/data/songs.json`. Neither missing song was found. Public GitHub repository discovery found only the current Keertana repository. Do not substitute `odiponivvadu`: no verified lyric match establishes it as `nee-krupa-odiponivvadhu`.
+
+Await owner-provided lyrics or an export from the previous site for:
+
+| Intended slug | Intended title | Next step |
+| --- | --- | --- |
+| `sugunala-sampannuda` | సుగుణాల సంపన్నుడా | Check supplied lyrics for duplicates, append without replacing existing records, build and audit the generated page. |
+| `nee-krupa-odiponivvadhu` | నీ కృప ఓడిపోనివ్వదు | Confirm the supplied version, check duplicates, append and verify the generated page. |
+
+The deployed prefix redirects will reach the canonical pages automatically once these exact slugs are restored. Include them in title search and sitemap through the existing build, then verify both old slash variants and the canonical URLs. No placeholder or fabricated lyrics pages were published.
+
+Search Console was rechecked on 15 October: the 404 report still says last update 12 October and 12 affected URLs. It predates the deployed repairs. Reassess after a newer report appears; do not start whole-report validation while the two song destinations remain missing and the artists URL is intentionally retired.
 
 ## Validation
 
