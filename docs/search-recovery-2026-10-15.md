@@ -3,6 +3,7 @@
 ## Completed locally
 
 - Vercel permanent HTTP 301 migration from single-segment `/songs/:slug` URLs to `/song/:slug/`. Language landing pages are handled first and retain their language destination. Nested language/letter and pagination routes remain unchanged.
+- Explicit rules cover both slash-ending and non-slash URLs. The first production check found that Vercel matched these forms separately; the configuration was corrected instead of relying solely on static HTML fallback.
 - Explicit spelling alias: `/songs/athyunnatha-simhasanamupai` → `/song/athyunnatha-simhaasanamupai/`.
 - Astro static fallback redirects for all catalog song slugs and the spelling alias, so the old URLs also work on a plain static preview. Vercel supplies HTTP status redirects; static fallback HTML uses meta refresh.
 - Curated Roman aliases for Neethi Suryuda Yesu and Nenemaina Prabhuva in page titles, descriptions, visible subtitles, and MusicComposition alternateName. All song lyrics and native titles remain unchanged. English How Great Is Our God remains accurately labeled English.

@@ -2,7 +2,10 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "redirects": [
     { "source": "/songs/athyunnatha-simhasanamupai", "destination": "/song/athyunnatha-simhaasanamupai/", "statusCode": 301 },
+    { "source": "/songs/athyunnatha-simhasanamupai/", "destination": "/song/athyunnatha-simhaasanamupai/", "statusCode": 301 },
     { "source": "/songs/:lang(telugu|hindi|english)", "destination": "/:lang/", "statusCode": 301 },
-    { "source": "/songs/:slug", "destination": "/song/:slug/", "statusCode": 301 }
+    { "source": "/songs/:lang(telugu|hindi|english)/", "destination": "/:lang/", "statusCode": 301 },
+    { "source": "/songs/:slug", "destination": "/song/:slug/", "statusCode": 301 },
+    { "source": "/songs/:slug/", "destination": "/song/:slug/", "statusCode": 301 }
   ]
 }
