@@ -5,16 +5,56 @@
 .collections-eyebrow { font-size: .7rem; letter-spacing: .12em; color: var(--accent); }
 .collections-intro h1 { font-size: clamp(2rem, 5vw, 3.25rem); line-height: 1.2; font-weight: 650; letter-spacing: -.035em; margin-block: .75rem 1rem; }
 .collections-intro > p:last-child { color: var(--text-muted); line-height: 1.8; }
-.worship-collection-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
-.worship-collection-card { display: block; padding: 1.5rem; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); transition: border-color .15s, background .15s; }
-.worship-collection-card:hover { border-color: var(--accent); background: var(--accent-bg); }
-.collection-number { color: var(--accent); font-size: .8rem; }
-.collection-song-count { float: right; font-size: .8rem; color: var(--text-muted); }
-.worship-collection-card h2 { font-size: 1.375rem; font-weight: 600; margin-block: 1.5rem .25rem; }
+.worship-collection-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
+.collection-theme-christmas { --collection-hue: #8c423a; }
+.collection-theme-praise { --collection-hue: #8a4a32; }
+.collection-theme-thanksgiving { --collection-hue: #6d602d; }
+.collection-theme-cross { --collection-hue: #755075; }
+.collection-theme-prayer { --collection-hue: #436d70; }
+.collection-theme-hope { --collection-hue: #416c4e; }
+[data-theme="dark"] .collection-theme-christmas { --collection-hue: #e3a097; }
+[data-theme="dark"] .collection-theme-praise { --collection-hue: #edab83; }
+[data-theme="dark"] .collection-theme-thanksgiving { --collection-hue: #d3bf7c; }
+[data-theme="dark"] .collection-theme-cross { --collection-hue: #c7a3ce; }
+[data-theme="dark"] .collection-theme-prayer { --collection-hue: #8ebfc1; }
+[data-theme="dark"] .collection-theme-hope { --collection-hue: #a1c69e; }
+.worship-collection-card { min-width: 0; overflow: hidden; display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); transition: border-color .18s, box-shadow .18s, transform .18s; }
+.worship-collection-card:hover { border-color: var(--collection-hue); box-shadow: var(--shadow-md); transform: translateY(-3px); }
+.worship-collection-card:focus-visible, .collections-view-all:focus-visible, .collections-more a:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+.collection-art { display: grid; place-items: center; position: relative; overflow: hidden; isolation: isolate; min-height: 120px; color: var(--collection-hue, var(--accent)); background: color-mix(in srgb, var(--collection-hue, var(--accent)) 12%, var(--surface)); }
+.collection-art::before { content: ''; position: absolute; z-index: -1; width: 210px; height: 210px; border: 1px solid color-mix(in srgb, currentColor 12%, transparent); border-radius: 50%; transform: translate(105px, 42px); }
+.collection-art::after { content: ''; position: absolute; z-index: -1; width: 180px; height: 180px; border: 1px solid color-mix(in srgb, currentColor 12%, transparent); border-radius: 50%; transform: translate(-115px, -30px); }
+.collection-art svg { width: 160px; height: 120px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.collection-art-orbit { stroke-opacity: .16; }
+.collection-art-fill { fill: currentColor; fill-opacity: .15; }
+.collection-card-content { display: flex; flex-direction: column; flex: 1; padding: 1.25rem 1.5rem; }
+.collection-card-occasion { color: var(--collection-hue); font-size: .6875rem; font-weight: 650; letter-spacing: .065em; text-transform: uppercase; line-height: 1.6; margin-bottom: .5rem; }
+.worship-collection-card :is(h2,h3) { font-size: 1.3125rem; font-weight: 650; letter-spacing: -.025em; line-height: 1.35; margin: 0; }
 .collection-native-title { font-size: 1rem; line-height: 1.8; color: var(--text-muted); margin-block: .25rem .75rem; }
-.worship-collection-card > p:not(.collection-native-title) { font-size: .875rem; line-height: 1.8; color: var(--text-muted); }
-.collection-open { display: block; margin-top: 1.5rem; color: var(--accent); font-size: .875rem; }
+.collection-card-content .collection-native-title { font-size: .875rem; margin-block: .35rem .625rem; }
+.collection-card-summary { font-size: .875rem; line-height: 1.7; color: var(--text-muted); margin-bottom: 1.25rem; }
+.collection-card-footer { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding-top: .75rem; margin-top: auto; border-top: 1px solid var(--border-subtle); font-size: .75rem; color: var(--text-muted); }
+.collection-open { color: var(--collection-hue); font-weight: 650; font-size: .8125rem; }
+.collection-open > span { display: inline-block; margin-left: .25rem; }
+.home-collections { padding-block: 3rem; border-bottom: 1px solid var(--border); scroll-margin-top: 6rem; }
+.home-collections-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: 1.75rem; }
+.home-collections-header h2 { font-size: clamp(1.625rem, 3vw, 2rem); font-weight: 650; letter-spacing: -.035em; line-height: 1.3; margin-block: .5rem; }
+.home-collections-header p:last-child { font-size: .9375rem; color: var(--text-muted); }
+.collections-view-all { display: inline-flex; align-items: center; gap: .75rem; min-height: 44px; font-size: .875rem; color: var(--accent); white-space: nowrap; }
+.collections-detail-header { display: flex; align-items: center; gap: 3rem; padding-bottom: 2rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); }
+.collections-detail-header .collections-intro { flex: 1; margin-bottom: 0; }
+.collections-detail-header .collections-eyebrow { text-transform: uppercase; line-height: 1.8; color: var(--collection-hue); }
+.collections-detail-header > .collection-art { flex: 0 0 200px; height: 200px; border-radius: 50%; }
+.collections-detail-header > .collection-art svg { width: 200px; height: 150px; }
 .collection-song-list { max-width: 800px; }
+.collection-song-list .song-row { display: flex; align-items: center; gap: 1rem; min-height: 88px; padding: 1rem .75rem; border-bottom: 1px solid var(--border); transition: background-color .15s, color .15s; }
+.collection-song-list .song-row:hover, .collection-song-list .song-row:focus-visible { background: var(--surface); color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.collection-song-list .song-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.collection-song-list .song-row-content { min-width: 0; flex: 1; }
+.collection-song-list .song-title { display: block; font-size: 1.0625rem; font-weight: 500; line-height: 1.7; overflow-wrap: anywhere; }
+.collection-song-list .song-language { display: block; font-size: .75rem; line-height: 1.5; color: var(--text-muted); margin-top: .375rem; }
+.collection-song-list .song-arrow { flex-shrink: 0; color: var(--text-muted); }
+.collection-song-list .browse-saved[hidden] { display: none; }
 .collection-roman-title { margin: -.35rem 0 .75rem .25rem; font-size: .8125rem; color: var(--text-muted); }
 .collections-guidance { max-width: 800px; padding: 1.5rem; margin-top: 2.5rem; background: var(--surface-subtle); border-radius: 12px; }
 .collections-guidance h2, .collections-more h2 { font-size: 1.125rem; font-weight: 600; margin-bottom: .5rem; }
@@ -22,6 +62,22 @@
 .collections-guidance a, .collections-more a { display: inline-flex; align-items: center; min-height: 44px; color: var(--accent); font-size: .875rem; }
 .collections-guidance .collections-small-note { font-size: .8125rem; margin-bottom: 0; }
 .collections-more { margin-top: 2rem; }
-.collections-more a { margin-right: 1.5rem; }
-@media (max-width: 760px) { .worship-collection-grid { grid-template-columns: 1fr; } .collections-intro { margin-bottom: 1.75rem; } }
-@media (prefers-reduced-motion: reduce) { .worship-collection-card { transition: none; } }
+.collections-more a { margin: .5rem .5rem 0 0; padding: .625rem 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.collections-more a:hover { border-color: var(--accent); }
+@media (max-width: 960px) and (min-width: 601px) { .worship-collection-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+@media (max-width: 760px) { .collections-intro { margin-bottom: 1.75rem; } .collections-detail-header { gap: 1rem; } .collections-detail-header > .collection-art { flex-basis: 110px; height: 110px; } .collections-detail-header > .collection-art svg { width: 140px; height: 105px; } }
+@media (max-width: 600px) {
+  .home-collections { padding-block: 2rem; }
+  .home-collections-header { align-items: flex-start; flex-direction: column; gap: .25rem; margin-bottom: 1rem; }
+  .worship-collection-grid { grid-template-columns: 1fr; gap: .875rem; }
+  .worship-collection-card { flex-direction: row; border-radius: 14px; }
+  .worship-collection-card > .collection-art { flex: 0 0 76px; min-height: 100%; }
+  .worship-collection-card > .collection-art svg { width: 110px; height: 90px; }
+  .collection-card-content { padding: 1rem; min-width: 0; }
+  .worship-collection-card :is(h2,h3) { font-size: 1.125rem; }
+  .collection-card-occasion { font-size: .625rem; letter-spacing: .04em; }
+  .collection-card-content .collection-native-title { font-size: .8125rem; margin-block: .25rem .5rem; }
+  .collection-card-summary { font-size: .8125rem; margin-bottom: .75rem; }
+  .collections-detail-header > .collection-art { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .worship-collection-card { transition: none; } .worship-collection-card:hover { transform: none; } }

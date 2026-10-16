@@ -1,0 +1,15 @@
+---
+interface Props { theme: string; }
+const { theme } = Astro.props;
+---
+<span class={`collection-art collection-art-${theme}`} aria-hidden="true">
+  <svg viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle class="collection-art-orbit" cx="80" cy="60" r="43" />
+    {theme === 'christmas' && <g><path class="collection-art-fill" d="m80 20 8 27 28 1-23 17 8 27-21-16-23 16 9-27-23-17 28-1z"/><path d="M30 25v8m-4-4h8m91 55v8m-4-4h8M119 22v5m-2.5-2.5h5"/></g>}
+    {theme === 'praise' && <g><path d="M66 78V39l38-8v39M66 49l38-8"/><ellipse class="collection-art-fill" cx="56" cy="80" rx="10" ry="7" transform="rotate(-15 56 80)"/><ellipse class="collection-art-fill" cx="94" cy="72" rx="10" ry="7" transform="rotate(-15 94 72)"/><path d="M36 45v10m-5-5h10m80 32v8m-4-4h8"/></g>}
+    {theme === 'thanksgiving' && <g><path d="M80 93V29m0 29C58 58 48 48 48 38c20 0 32 10 32 20Zm0 17C58 75 48 65 48 55c20 0 32 10 32 20Zm0-17c22 0 32-10 32-20-20 0-32 10-32 20Zm0 17c22 0 32-10 32-20-20 0-32 10-32 20Z"/><path d="m75 92 5 5 5-5"/></g>}
+    {theme === 'cross' && <g><path class="collection-art-fill" d="M75 24h10v25h24v10H85v35H75V59H51V49h24z"/><path d="M46 98c22-9 46-9 68 0M80 10v5m-38 9 5 5m70-5-5 5"/></g>}
+    {theme === 'prayer' && <g><path d="M79 77 64 62V35c-7-2-9 2-9 9v18L44 51c-5-4-10 0-6 6l19 29 14 8m10-17 15-15V35c7-2 9 2 9 9v18l11-11c5-4 10 0 6 6l-19 29-14 8M80 18v9m-15-5 4 7m26-7-4 7"/></g>}
+    {theme === 'hope' && <g><path d="M35 80h90M55 79a25 25 0 0 1 50 0M80 24v12m-35 5 8 8m62-8-8 8M31 60l11 3m87-3-11 3M48 94h64"/><path class="collection-art-fill" d="M55 79a25 25 0 0 1 50 0Z"/></g>}
+  </svg>
+</span>

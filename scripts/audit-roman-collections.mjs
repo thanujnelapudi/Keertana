@@ -20,8 +20,13 @@ for (const song of songs) {
   assert.equal(api.romanReading?.text || null, reading?.text || null);
 }
 const sitemap = await readFile(path.join(out, 'sitemap-0.xml'), 'utf8');
+const homepage = await readFile(path.join(out, 'index.html'), 'utf8');
+const collectionsIndex = await readFile(path.join(out, 'collections', 'index.html'), 'utf8');
+assert.ok(homepage.includes('id="worship-collections"'), 'Homepage collection section is missing');
 for (const collection of worshipCollections) {
   const route = `/collections/${collection.slug}/`;
+  assert.ok(homepage.includes(`href="${route}"`), `Missing homepage collection card: ${route}`);
+  assert.ok(collectionsIndex.includes(`href="${route}"`), `Missing collections index card: ${route}`);
   const html = await readFile(path.join(out, 'collections', collection.slug, 'index.html'), 'utf8');
   assert.ok(sitemap.includes(route), `Collection not in sitemap: ${route}`);
   assert.ok(!/<meta[^>]+name="robots"[^>]+noindex/.test(html));

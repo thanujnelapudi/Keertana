@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import SongRow from '../../components/SongRow.astro';
+import CollectionArt from '../../components/CollectionArt.astro';
 import { worshipCollections } from '../../lib/worship-collections';
 import { songs, detectSongLanguage } from '../../lib/songs';
 import { SEARCH_TITLE_ALIASES } from '../../lib/song-seo';
@@ -28,7 +29,7 @@ const jsonLd = [
 <Base title={`${collection.title} – Christian Song Lyrics | Keertana`} description={collection.description} canonical={canonical} jsonLd={jsonLd}>
   <div class="container-page worship-collections-page">
     <nav class="collections-breadcrumb" aria-label="Breadcrumb"><a href="/">Keertana</a><span aria-hidden="true">/</span><a href="/collections/">Collections</a><span aria-hidden="true">/</span><span aria-current="page">{collection.title}</span></nav>
-    <header class="collections-intro"><p class="collections-eyebrow">A SELECTION FOR WORSHIP · {selectedSongs.length} SONGS</p><h1>{collection.title}</h1><p class="collection-native-title" lang="te">{collection.nativeTitle}</p><p>{collection.intro}</p></header>
+    <header class={`collections-detail-header collection-theme-${collection.theme}`}><div class="collections-intro"><p class="collections-eyebrow">{collection.occasion} · {selectedSongs.length} songs</p><h1>{collection.title}</h1><p class="collection-native-title" lang="te">{collection.nativeTitle}</p><p>{collection.intro}</p></div><CollectionArt theme={collection.theme} /></header>
     <section aria-label={collection.title} class="collection-song-list">{selectedSongs.map(song => {
       const language = detectSongLanguage(song);
       return <SongRow song={song} label={language.langLabel} locale={language.langCode} romanTitle={language.langCode !== 'en' ? SEARCH_TITLE_ALIASES[song.slug] || getRomanReading(song.title)?.text : undefined} />;

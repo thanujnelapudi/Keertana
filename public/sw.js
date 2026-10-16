@@ -1,6 +1,6 @@
 // Keertana Service Worker
 // Caching strategy: precache essentials, stale-while-revalidate for visited pages
-const CACHE_VERSION = 'keertana-v8-roman-collections';
+const CACHE_VERSION = 'keertana-v9-collection-cards';
 const PRECACHE = [
   '/',
   '/offline/',

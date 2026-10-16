@@ -1,0 +1,21 @@
+---
+import CollectionArt from './CollectionArt.astro';
+import { worshipCollections } from '../lib/worship-collections';
+import '../styles/collections.css';
+interface Props { headingLevel?: 'h2' | 'h3'; }
+const { headingLevel: Heading = 'h2' } = Astro.props;
+---
+<div class="worship-collection-grid">
+  {worshipCollections.map(collection => (
+    <a class={`worship-collection-card collection-theme-${collection.theme}`} href={`/collections/${collection.slug}/`}>
+      <CollectionArt theme={collection.theme} />
+      <div class="collection-card-content">
+        <p class="collection-card-occasion">{collection.occasion}</p>
+        <Heading>{collection.title}</Heading>
+        <p lang="te" class="collection-native-title">{collection.nativeTitle}</p>
+        <p class="collection-card-summary">{collection.summary}</p>
+        <span class="collection-card-footer"><span>{collection.songs.length} songs</span><span class="collection-open">Explore <span aria-hidden="true">↗</span></span></span>
+      </div>
+    </a>
+  ))}
+</div>

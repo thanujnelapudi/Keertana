@@ -4,6 +4,7 @@ import BrowseEnhancements from '../components/BrowseEnhancements.astro';
 import Base from '../layouts/Base.astro';
 import { getLanguagesData, type LangData } from '../lib/songs';
 import LocalLibrary from '../components/LocalLibrary.astro';
+import CollectionCards from '../components/CollectionCards.astro';
 
 const languages: LangData[] = getLanguagesData();
 const defaultLang = languages[0]; // Telugu
@@ -214,7 +215,17 @@ const LANGS_JSON = JSON.stringify(
         </div>
       </div>
     </div>
-    <div class="container-page browse-shortcuts"><a href="#browse-filters">Browse songs ↓</a><a href="/collections/">Worship collections →</a><a id="library-shortcut" href="#local-library" hidden>Your Library</a></div>
+    <div class="container-page browse-shortcuts"><a href="#browse-filters">Browse songs ↓</a><a href="#worship-collections">Explore collections ↓</a><a id="library-shortcut" href="#local-library" hidden>Your Library</a></div>
+  </section>
+
+  <section id="worship-collections" class="home-collections" aria-labelledby="home-collections-title">
+    <div class="container-page">
+      <header class="home-collections-header">
+        <div><p class="collections-eyebrow">FIND WORDS FOR YOUR WORSHIP</p><h2 id="home-collections-title">A song for every season.</h2><p>Start with the moment on your heart.</p></div>
+        <a class="collections-view-all" href="/collections/">All collections <span aria-hidden="true">→</span></a>
+      </header>
+      <CollectionCards headingLevel="h3" />
+    </div>
   </section>
 
   <!-- ══════════════════════════════════════════════════════════════════

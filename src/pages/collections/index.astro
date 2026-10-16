@@ -1,16 +1,13 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { worshipCollections } from '../../lib/worship-collections';
+import CollectionCards from '../../components/CollectionCards.astro';
 import '../../styles/collections.css';
 ---
-<Base title="Christian Worship Song Collections | Keertana" description="Explore Christmas, praise and worship, and thanksgiving song collections. Find lyrics for your gathering and arrange your own worship setlist.">
+<Base title="Christian Worship Song Collections | Keertana" description="Explore Christian song collections for Christmas, praise, thanksgiving, Good Friday, prayer, and hope. Find Telugu and English lyrics for your worship.">
   <div class="container-page worship-collections-page">
     <nav class="collections-breadcrumb" aria-label="Breadcrumb"><a href="/">Keertana</a><span aria-hidden="true">/</span><span aria-current="page">Collections</span></nav>
     <header class="collections-intro"><p class="collections-eyebrow">SONGS FOR YOUR GATHERING</p><h1>Find the songs<br />for this moment.</h1><p>Small, purposeful selections from Keertana’s library. Read a song, choose what fits, and bring your worship set together.</p></header>
-    <div class="worship-collection-grid">{worshipCollections.map((c, i) => <a class="worship-collection-card" href={`/collections/${c.slug}/`}>
-      <span class="collection-number" aria-hidden="true">0{i + 1}</span><span class="collection-song-count">{c.songs.length} songs</span>
-      <h2>{c.title}</h2><p lang="te" class="collection-native-title">{c.nativeTitle}</p><p>{c.description}</p><span class="collection-open">Explore songs →</span>
-    </a>)}</div>
+    <CollectionCards />
     <section class="collections-guidance"><h2>Make the selection yours</h2><p>These public collections are starting points. Your personal setlists let you choose songs from any language and arrange them in the order you’ll sing.</p><a href="/setlists/">Open your worship setlists →</a></section>
   </div>
 </Base>
