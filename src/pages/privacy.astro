@@ -1,7 +1,9 @@
 ---
 import Information from '../layouts/Information.astro';
+const commentsEnabled = import.meta.env.PUBLIC_COMMENTS_ENABLED === 'true';
 const contents = [
   {id:'information',label:'Information and forms'}, {id:'use',label:'How information is used'},
+  ...(commentsEnabled ? [{ id: 'song-discussion', label: 'Public song discussion' }] : []),
   {id:'storage',label:'Cookies and browser storage'}, {id:'services',label:'Services and external links'},
   {id:'retention',label:'Retention and your choices'}, {id:'security',label:'Security'},
   {id:'changes',label:'Changes'}, {id:'contact',label:'Privacy questions'},
@@ -33,6 +35,12 @@ const contents = [
       <div><dt>Offline cache</dt><dd>A service worker uses browser Cache Storage for the home and offline pages, search index, and visited same-site pages and resources. Cached pages can remain available offline and may briefly show an older version while refreshing. This is separate from cookies and local storage.</dd></div>
     </dl>
   </section>
+  {commentsEnabled && <section id="song-discussion" aria-labelledby="song-discussion-heading"><h2 id="song-discussion-heading">Public song discussion</h2>
+    <p>When you choose to view a song’s discussion, the browser contacts Keertana’s Supabase comments service for approved comments. Opening the comment form also loads Cloudflare Turnstile to check submissions for spam. These providers can receive technical request information, including your IP address and browser information, under their own policies. See <a href="https://supabase.com/privacy" rel="external">Supabase’s Privacy Policy</a> and <a href="https://www.cloudflare.com/privacypolicy/" rel="external">Cloudflare’s Privacy Policy</a>.</p>
+    <p>The comment form asks for a display name, a short comment, an optional HTTPS reference link, and confirmation that approved content may be public. No commenter account or email is requested. Submission sends those details, the song identifier, a request identifier used to avoid duplicate retries, and a spam-check token to the server. Keertana’s comment table does not include an IP address or email field.</p>
+    <p>Accepted comments are stored as pending for owner review. Only approved display names, comment text, reference links, publication dates, and public comment identifiers are returned to visitors. Pending and rejected comments and moderation notes are not publicly displayed. The owner can approve, reject, or remove entries in the secured moderation dashboard. Publication and a moderation response time are not guaranteed.</p>
+    <p>Your draft is kept only in the current form and is not saved to browser storage by this feature. Accepted submissions are stored in the Supabase database. No automatic deletion schedule is configured; the owner reviews retention and deletion separately. To request removal of a published comment, contact <a href="mailto:keertanasongs@gmail.com">keertanasongs@gmail.com</a> with the song link and enough details to identify the entry. Approved comments can be read or copied by others while public.</p>
+  </section>}
   <section id="services" aria-labelledby="services-heading"><h2 id="services-heading">Services and external links</h2>
     <p>The Latin font, Inter, is requested from Google Fonts. These requests connect to Google’s font servers and expose your IP address and request information needed to deliver the font. See <a href="https://fonts.googleblog.com/2022/11/your-privacy-and-google-fonts.html" rel="external">Google’s font-service privacy explanation</a>. Telugu and Devanagari fonts are bundled with Keertana and served with the site.</p>
     <p>The project’s default public address is on Vercel, but the active production hosting settings and enabled services have not been verified. If delivered through Vercel, that provider handles request information under its <a href="https://vercel.com/legal/privacy-notice" rel="external">Privacy Notice</a>. The owner must confirm the actual provider, logs, retention, and any dashboard-enabled analytics or protection before launch.</p>
@@ -45,7 +53,7 @@ const contents = [
     <p>Emails you send are stored in the receiving Gmail account, separately from the site and your browser storage. No automatic deletion schedule is configured by the website. Your email provider may also store sent messages and drafts. Google's handling is described in its <a href="https://policies.google.com/privacy" rel="external">Privacy Policy</a>. Do not rely on the form as a saved draft: navigating away can discard it.</p>
   </section>
   <section id="security" aria-labelledby="security-heading"><h2 id="security-heading">Security</h2>
-    <p>No website or browser store can promise absolute security. Avoid entering passwords, financial details, or other sensitive information in contribution fields. This version has no server-side submission store or deletion portal. Adding a receiver will require reviewing how information is secured, accessed, and retained before enabling it.</p>
+    <p>No website or browser store can promise absolute security. Avoid entering passwords, financial details, or other sensitive information in contribution fields. {commentsEnabled ? 'The comments store is separate from email contribution forms; removal requests are handled by the owner, and there is no self-service deletion portal.' : 'This version has no server-side submission store or deletion portal. Adding a receiver will require reviewing how information is secured, accessed, and retained before enabling it.'}</p>
   </section>
   <section id="changes" aria-labelledby="changes-heading"><h2 id="changes-heading">Changes to this page</h2>
     <p>This page will be updated when the site's services or data practices change. The date above identifies the last update; it does not certify legal compliance.</p>

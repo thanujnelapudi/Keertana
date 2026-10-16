@@ -12,7 +12,7 @@ for (const song of songs) {
   if (reading) {
     checkedRoman++;
     assert.ok(html.includes('id="roman-lyrics-body"'), `No Roman panel: ${song.slug}`);
-    assert.ok(html.includes('Automatic transliteration'), `No generated-text label: ${song.slug}`);
+    assert.ok(html.includes('Generated from the original lyrics'), `No generated-text label: ${song.slug}`);
     assert.ok(html.includes(`lang="${reading.lang}"`), `Wrong Roman language: ${song.slug}`);
   }
   const api = JSON.parse(await readFile(path.join(out, 'api', 'song', `${song.slug}.json`), 'utf8'));

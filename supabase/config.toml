@@ -1,0 +1,4 @@
+[functions.song-comments]
+# This is an intentionally public endpoint. POST is protected by server-side
+# Turnstile validation, fixed-origin checks, and transactional database limits.
+verify_jwt = false

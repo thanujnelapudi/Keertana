@@ -4,7 +4,7 @@ import { getRomanReading } from '../src/lib/roman-reading.ts';
 test('Roman Telugu preserves verses, numbers and existing Latin text', () => {
   const text = 'యేసు (2)\n\nనీ కృప YESU ౧';
   const r = getRomanReading(text);
-  assert.equal(r.label, 'Roman Telugu'); assert.equal(r.lang, 'te-Latn');
+  assert.equal(r.label, 'Telugu transliteration'); assert.equal(r.lang, 'te-Latn');
   assert.equal(r.generated, true); assert.equal(r.text.split('\n\n').length, 2);
   assert.match(r.text, /YESU 1/); assert.doesNotMatch(r.text, /[\u0c00-\u0c7f]/);
   assert.equal(text, 'యేసు (2)\n\nనీ కృప YESU ౧');

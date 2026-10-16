@@ -133,7 +133,7 @@ async function readSongs(print) {
       const article = node('article', '', 'setlist-print-song'); const title = node('h2', `${index + 1}. ${song.title}`); title.lang = song.langCode;
       const reading = useRoman && song.romanReading && typeof song.romanReading.text === 'string' ? song.romanReading : null;
       article.append(title);
-      if (reading) article.append(node('p', `${reading.label} · Automatic transliteration. Pronunciation may need correction; this is not an English translation.`, 'setlist-credit'));
+      if (reading) article.append(node('p', `${reading.label} · Generated from the original lyrics.`, 'setlist-credit'));
       const lyrics = node('div', reading ? reading.text : song.lyrics, 'setlist-full-lyrics'); lyrics.lang = reading ? reading.lang : song.lyricsLang;
       article.append(lyrics, node('p', 'Keertana · Song credit and rights belong to the respective creators and rights holders.', 'setlist-credit')); content.append(article);
     });

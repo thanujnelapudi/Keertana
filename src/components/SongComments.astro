@@ -1,0 +1,44 @@
+---
+import '../styles/song-comments.css';
+interface Props { song: { slug: string; title: string }; }
+const { song } = Astro.props;
+const enabled = import.meta.env.PUBLIC_COMMENTS_ENABLED === 'true';
+const endpoint = import.meta.env.PUBLIC_COMMENTS_ENDPOINT || '';
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
+if (enabled) {
+  let valid = false;
+  try { const url = new URL(endpoint); valid = (url.protocol === 'https:' || (url.protocol === 'http:' && ['127.0.0.1', 'localhost'].includes(url.hostname))) && !url.username && !url.password && !url.search && !url.hash; } catch {}
+  if (!valid || !siteKey) throw new Error('Comments enabled without a valid public endpoint and Turnstile site key.');
+}
+---
+<section class="song-comments" data-pagefind-ignore aria-labelledby="song-comments-heading" data-comments-enabled={enabled ? 'true' : 'false'} data-song={song.slug} data-endpoint={enabled ? endpoint : undefined} data-site-key={enabled ? siteKey : undefined}>
+  <header><p class="song-comments-eyebrow">HELP EACH OTHER WORSHIP</p><h2 id="song-comments-heading">{enabled ? 'Song discussion' : 'Help improve this song'}</h2><p>{enabled ? 'Share a pronunciation correction, ask about this song, or suggest a reference. Comments appear after review.' : 'Know a correction or a useful reference for this song? Share it with the Keertana team.'}</p></header>
+  {enabled ? <>
+    <button class="comments-button comments-secondary" type="button" data-load-comments>View song discussion</button>
+    <p class="comments-status" data-comments-list-status role="status" aria-live="polite"></p>
+    <div data-comments-discussion hidden>
+      <ol class="comments-list" data-comments-list></ol>
+      <button class="comments-button comments-secondary" type="button" data-more-comments hidden>Load more comments</button>
+      <details class="comments-compose"><summary>Leave a comment</summary>
+        <p class="comments-small">Your display name, approved comment, and reference link will be public. No account or email is required. Please share short notes and links rather than full song lyrics.</p>
+        <form class="comments-form" novalidate>
+          <label for="comment-name">Display name *<input id="comment-name" name="displayName" maxlength="60" required autocomplete="nickname" aria-describedby="comment-name-error" /><span id="comment-name-error" data-comment-error="displayName" class="comments-error" hidden></span></label>
+          <label for="comment-body">Comment *<textarea id="comment-body" name="body" rows="4" minlength="5" maxlength="2000" required aria-describedby="comment-body-error" placeholder="A correction, question, or helpful reference…"></textarea><span id="comment-body-error" data-comment-error="body" class="comments-error" hidden></span></label>
+          <label for="comment-reference">Reference link <span class="comments-optional">(optional)</span><input id="comment-reference" name="referenceUrl" type="url" maxlength="1000" placeholder="https://" aria-describedby="comment-reference-error" /><span id="comment-reference-error" data-comment-error="referenceUrl" class="comments-error" hidden></span></label>
+          <div class="comments-honeypot" aria-hidden="true"><label for="comment-website">Leave this field empty<input id="comment-website" name="website" tabindex="-1" autocomplete="off" /></label></div>
+          <label class="comments-consent" for="comment-consent"><input id="comment-consent" name="consent" type="checkbox" required aria-describedby="comment-consent-error" /><span>I understand that my comment and display name may be published after review. *</span></label><p id="comment-consent-error" data-comment-error="consent" class="comments-error" hidden></p>
+          <div class="comments-verification"><div data-turnstile></div><p data-comment-error="token" class="comments-small" role="status" aria-live="polite">The spam check loads when you open this form.</p><button class="comments-button comments-secondary" data-retry-verification type="button" hidden>Retry spam check</button></div>
+          <p class="comments-status" data-comment-status role="status" aria-live="polite" tabindex="-1" hidden></p>
+          <button class="comments-button" data-submit-comment type="submit" disabled>Submit for review</button>
+        </form>
+      </details>
+    </div>
+    <noscript><p class="comments-small">JavaScript is needed for public discussion. You can still use the correction link below.</p></noscript>
+  </> : null}
+  <a class="comments-correction-link" href={`/contribute/report/?song=${encodeURIComponent(song.slug)}`}>Suggest a correction or share a reference →</a>
+  {enabled && <p class="comments-small">Discussion uses Supabase and Cloudflare Turnstile when you open it. <a href="/privacy/#song-discussion">How comments are handled</a></p>}
+</section>
+<script>
+  import { initSongComments } from '../scripts/song-comments.js';
+  initSongComments(document.querySelector('.song-comments'));
+</script>

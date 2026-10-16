@@ -12,5 +12,5 @@ export function getRomanReading(text: string) {
   // Do not advertise a complete Roman view if unsupported native letters remain.
   if (/[\u0c00-\u0c63\u0900-\u0963]/.test(roman)) return null;
   const language = telugu && hindi ? 'Telugu / Hindi' : telugu ? 'Telugu' : 'Hindi';
-  return { text: roman, label: `Roman ${language}`, lang: telugu && !hindi ? 'te-Latn' : hindi && !telugu ? 'hi-Latn' : 'und-Latn', generated: true };
+  return { text: roman, label: `${language} transliteration`, lang: telugu && !hindi ? 'te-Latn' : hindi && !telugu ? 'hi-Latn' : 'und-Latn', generated: true };
 }

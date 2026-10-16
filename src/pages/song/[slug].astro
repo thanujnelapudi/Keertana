@@ -5,6 +5,7 @@ import { songs, detectSongLanguage } from '../../lib/songs';
 import { getRomanizedLyrics } from '../../lib/transliterate';
 import { songSearchTitle } from '../../lib/song-seo';
 import { getRomanReading } from '../../lib/roman-reading';
+import SongComments from '../../components/SongComments.astro';
 import { collectionsForSong, relatedSongSlugs } from '../../lib/worship-collections';
 
 export function getStaticPaths() {
@@ -181,9 +182,9 @@ const relatedSongs = relatedSongSlugs(song.slug).map(slug => songs.find(s => s.s
       {romanReading && <>
         <div id="reading-script-controls" class="reading-script-controls" role="group" aria-label="Lyrics script" hidden>
           <button id="original-script-btn" class="action-btn" type="button" aria-pressed="true">Original lyrics</button>
-          <button id="roman-script-btn" class="action-btn" type="button" aria-pressed="false">{romanReading.label}</button>
+          <button id="roman-script-btn" class="action-btn" type="button" aria-pressed="false">Transliteration</button>
         </div>
-        <noscript><p class="reading-note">Roman text is also included below the original lyrics. It is an automatic pronunciation aid.</p></noscript>
+        <noscript><p class="reading-note">Transliteration is included below the original lyrics.</p></noscript>
       </>}
       <!-- Visible lyrics -->
       <div
@@ -192,7 +193,7 @@ const relatedSongs = relatedSongSlugs(song.slug).map(slug => songs.find(s => s.s
       >{song.lyrics}</div>
 
       {romanReading && <section id="roman-reading-panel" hidden aria-label={romanReading.label}>
-        <p class="reading-note">{romanReading.label} · Automatic transliteration. Pronunciation may need correction; this is not an English translation. <a href={`/contribute/report/?song=${song.slug}`}>Suggest a correction →</a></p>
+        <p class="reading-note">{romanReading.label} · Generated from the original lyrics. <a href={`/contribute/report/?song=${song.slug}`}>Suggest a correction →</a></p>
         <div id="roman-lyrics-body" lang={romanReading.lang}>{romanReading.text}</div>
       </section>}
       {romanReading && <noscript><style is:inline>#roman-reading-panel[hidden] { display: block !important; margin-top: 2rem; }</style></noscript>}
@@ -216,6 +217,8 @@ const relatedSongs = relatedSongSlugs(song.slug).map(slug => songs.find(s => s.s
       <div class="reader-collection-links">{songCollections.map(c => <a href={`/collections/${c.slug}/`}>{c.title} →</a>)}</div>
       {relatedSongs.length > 0 && <ul>{relatedSongs.map(s => <li><a href={`/song/${s!.slug}/`}><span lang={detectSongLanguage(s!).langCode}>{s!.title}</span>{getRomanReading(s!.title) && <span class="related-roman-title" lang="und-Latn">{getRomanReading(s!.title)!.text}</span>}</a></li>)}</ul>}
     </section>}
+
+    <SongComments song={song} />
 
     <!-- Bottom Navigation -->
     <nav class="reader-bottom-nav" aria-label="More songs" style="margin-top: 2.5rem; display: flex; gap: 1.25rem; flex-wrap: wrap;">
@@ -399,7 +402,7 @@ const relatedSongs = relatedSongSlugs(song.slug).map(slug => songs.find(s => s.s
       originalScript?.setAttribute('aria-pressed', String(!roman));
       romanScript?.setAttribute('aria-pressed', String(roman));
       const feedback = document.getElementById('reader-status');
-      if (feedback) feedback.textContent = roman ? 'Roman reading selected. Copy and Print will use this text.' : 'Original lyrics selected.';
+      if (feedback) feedback.textContent = roman ? 'Transliteration selected. Copy and Print will use this text.' : 'Original lyrics selected.';
     }
     originalScript?.addEventListener('click', () => applyScript(false));
     romanScript?.addEventListener('click', () => applyScript(true));

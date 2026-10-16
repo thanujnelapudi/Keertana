@@ -3,7 +3,7 @@
   @page { margin: 16mm; }
   html, body { background: white !important; color: black !important; font-size: 12pt; }
   .site-header, .site-footer, .song-detail > nav, .song-toolbar, .reader-status,
-  .saved-songs-access, .reader-bottom-nav, .reading-script-controls, .reader-discovery, .sr-only, astro-dev-toolbar { display: none !important; }
+  .saved-songs-access, .reader-bottom-nav, .reading-script-controls, .reader-discovery, .song-comments, .sr-only, astro-dev-toolbar { display: none !important; }
   .song-detail { width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
   .song-detail > header { margin-bottom: 6mm !important; break-after: avoid; }
   .reader-title { color: black !important; font-size: 22pt !important; line-height: 1.5 !important; margin: 0 !important; }

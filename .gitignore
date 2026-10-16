@@ -14,6 +14,8 @@
 /src/data/songs.json.*.tmp
 /.dependency-*.json
 /.astro5-versions.json
+/.comments-check/
+/.comments-preview/
 /*.png
 *.log
 
@@ -22,5 +24,7 @@
 .env.*
 !.env.example
 /.vercel/
+/supabase/.temp/
+/supabase/.branches/
 .DS_Store
 Thumbs.db
