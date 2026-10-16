@@ -117,6 +117,8 @@ el('backup-setlists').addEventListener('click', () => {
 });
 async function readSongs(print) {
   const list = selected(); if (!list || busy) return;
+  const scriptSelect = el(shared ? 'shared-setlist-script' : 'setlist-script');
+  const useRoman = scriptSelect.value === 'roman'; scriptSelect.disabled = true;
   const snapshot = JSON.stringify(list); busy = true; render(); status('Preparing your lyrics…');
   try {
     const songs = [];
@@ -129,15 +131,18 @@ async function readSongs(print) {
     const content = el('setlist-lyrics'); content.replaceChildren(node('h1', list.name));
     songs.forEach((song, index) => {
       const article = node('article', '', 'setlist-print-song'); const title = node('h2', `${index + 1}. ${song.title}`); title.lang = song.langCode;
-      const lyrics = node('div', song.lyrics, 'setlist-full-lyrics'); lyrics.lang = song.lyricsLang;
-      article.append(title, lyrics, node('p', 'Keertana · Song credit and rights belong to the respective creators and rights holders.', 'setlist-credit')); content.append(article);
+      const reading = useRoman && song.romanReading && typeof song.romanReading.text === 'string' ? song.romanReading : null;
+      article.append(title);
+      if (reading) article.append(node('p', `${reading.label} · Automatic transliteration. Pronunciation may need correction; this is not an English translation.`, 'setlist-credit'));
+      const lyrics = node('div', reading ? reading.text : song.lyrics, 'setlist-full-lyrics'); lyrics.lang = reading ? reading.lang : song.lyricsLang;
+      article.append(lyrics, node('p', 'Keertana · Song credit and rights belong to the respective creators and rights holders.', 'setlist-credit')); content.append(article);
     });
     el('setlist-reading').hidden = false; el('setlist-workspace').hidden = true; status('Your songs are ready, in worship order.');
     el('shared-setlist').hidden = true;
     el('close-setlist-reading').focus();
     if (print) { await document.fonts.ready; window.print(); }
   } catch (error) { status(error.message || 'Could not prepare lyrics. Please try again.'); }
-  finally { busy = false; el('read-setlist').disabled = el('print-setlist').disabled = !selected()?.songs.length; }
+  finally { busy = false; scriptSelect.disabled = false; el('read-setlist').disabled = el('print-setlist').disabled = !selected()?.songs.length; }
 }
 el('read-setlist').addEventListener('click', () => readSongs(false)); el('print-setlist').addEventListener('click', () => readSongs(true));
 el('read-shared-setlist').addEventListener('click', () => readSongs(false)); el('print-shared-setlist').addEventListener('click', () => readSongs(true));

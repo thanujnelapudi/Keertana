@@ -4,6 +4,8 @@ import '../../styles/print.css';
 import { songs, detectSongLanguage } from '../../lib/songs';
 import { getRomanizedLyrics } from '../../lib/transliterate';
 import { songSearchTitle } from '../../lib/song-seo';
+import { getRomanReading } from '../../lib/roman-reading';
+import { collectionsForSong, relatedSongSlugs } from '../../lib/worship-collections';
 
 export function getStaticPaths() {
   return songs.map((song) => ({ params: { slug: song.slug }, props: { song } }));
@@ -49,6 +51,9 @@ const jsonLd = [
 ];
 
 const romanizedLyrics = getRomanizedLyrics(song.lyrics);
+const romanReading = getRomanReading(song.lyrics);
+const songCollections = collectionsForSong(song.slug);
+const relatedSongs = relatedSongSlugs(song.slug).map(slug => songs.find(s => s.slug === slug)).filter(Boolean);
 ---
 
 <Base
@@ -173,11 +178,24 @@ const romanizedLyrics = getRomanizedLyrics(song.lyrics);
         box-shadow: var(--shadow-sm);
       "
     >
+      {romanReading && <>
+        <div id="reading-script-controls" class="reading-script-controls" role="group" aria-label="Lyrics script" hidden>
+          <button id="original-script-btn" class="action-btn" type="button" aria-pressed="true">Original lyrics</button>
+          <button id="roman-script-btn" class="action-btn" type="button" aria-pressed="false">{romanReading.label}</button>
+        </div>
+        <noscript><p class="reading-note">Roman text is also included below the original lyrics. It is an automatic pronunciation aid.</p></noscript>
+      </>}
       <!-- Visible lyrics -->
       <div
         id="lyrics-body"
         lang={langInfo.lyricsLang}
       >{song.lyrics}</div>
+
+      {romanReading && <section id="roman-reading-panel" hidden aria-label={romanReading.label}>
+        <p class="reading-note">{romanReading.label} · Automatic transliteration. Pronunciation may need correction; this is not an English translation. <a href={`/contribute/report/?song=${song.slug}`}>Suggest a correction →</a></p>
+        <div id="roman-lyrics-body" lang={romanReading.lang}>{romanReading.text}</div>
+      </section>}
+      {romanReading && <noscript><style is:inline>#roman-reading-panel[hidden] { display: block !important; margin-top: 2rem; }</style></noscript>}
 
       <!-- Hidden romanized/phonetic text for Pagefind indexing so roman queries find Telugu lyrics -->
       {romanizedLyrics && (
@@ -191,6 +209,13 @@ const romanizedLyrics = getRomanizedLyrics(song.lyrics);
       )}
     </article>
     <p class="print-attribution">Keertana · Song credit and rights belong to the respective creators and rights holders.</p>
+
+    {songCollections.length > 0 && <section class="reader-discovery" aria-label="Worship collections">
+      <h2>Find your next song</h2>
+      <p>Explore this song with others for the same worship occasion.</p>
+      <div class="reader-collection-links">{songCollections.map(c => <a href={`/collections/${c.slug}/`}>{c.title} →</a>)}</div>
+      {relatedSongs.length > 0 && <ul>{relatedSongs.map(s => <li><a href={`/song/${s!.slug}/`}><span lang={detectSongLanguage(s!).langCode}>{s!.title}</span>{getRomanReading(s!.title) && <span class="related-roman-title" lang="und-Latn">{getRomanReading(s!.title)!.text}</span>}</a></li>)}</ul>}
+    </section>}
 
     <!-- Bottom Navigation -->
     <nav class="reader-bottom-nav" aria-label="More songs" style="margin-top: 2.5rem; display: flex; gap: 1.25rem; flex-wrap: wrap;">
@@ -238,6 +263,19 @@ const romanizedLyrics = getRomanizedLyrics(song.lyrics);
 </script>
 
 <style>
+  .reading-script-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem; }
+  .reading-script-controls[hidden], #roman-reading-panel[hidden], #lyrics-body[hidden] { display: none; }
+  .reading-script-controls [aria-pressed="true"] { color: var(--accent); background: var(--accent-bg); border-color: var(--accent); }
+  .reading-note { font-size: 0.8125rem; line-height: 1.7; color: var(--text-muted); margin-bottom: 1.25rem; }
+  .reading-note a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+  #roman-lyrics-body { white-space: pre-wrap; overflow-wrap: anywhere; font-size: var(--lyrics-font-size, 18px); line-height: 1.9; }
+  .reader-discovery { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+  .reader-discovery h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .reader-discovery p { font-size: 0.875rem; color: var(--text-muted); }
+  .reader-discovery ul { list-style: none; padding: 0; }
+  .reader-discovery li a { display: block; padding-block: 0.75rem; border-bottom: 1px solid var(--border-subtle); line-height: 1.7; }
+  .related-roman-title { display: block; font-size: .8125rem; color: var(--text-muted); }
+  .reader-collection-links { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-block: 1rem; color: var(--accent); font-size: 0.875rem; }
   .reader-title-alias { margin: -0.5rem 0 1.25rem; color: var(--text-muted); font-size: 0.9375rem; overflow-wrap: anywhere; }
   .reader-status { min-height: 1.5em; margin: 0.375rem 0 0; color: var(--text-muted); font-size: 0.8125rem; }
   .saved-songs-access { display: inline-block; padding: 0.5rem 0; font-size: 0.8125rem; color: var(--accent); }
@@ -346,7 +384,26 @@ const romanizedLyrics = getRomanizedLyrics(song.lyrics);
   });
 </script>
 
-<script define:vars={{ lyricsText: song.lyrics, songTitle: song.title }}>
+<script define:vars={{ lyricsText: song.lyrics, songTitle: song.title, romanLyricsText: romanReading?.text || null }}>
+  let readingRoman = false;
+  const originalPanel = document.getElementById('lyrics-body');
+  const romanPanel = document.getElementById('roman-reading-panel');
+  const originalScript = document.getElementById('original-script-btn');
+  const romanScript = document.getElementById('roman-script-btn');
+  if (typeof romanLyricsText === 'string' && romanPanel && originalPanel) {
+    const controls = document.getElementById('reading-script-controls');
+    if (controls) controls.hidden = false;
+    function applyScript(roman) {
+      readingRoman = roman;
+      originalPanel.hidden = roman; romanPanel.hidden = !roman;
+      originalScript?.setAttribute('aria-pressed', String(!roman));
+      romanScript?.setAttribute('aria-pressed', String(roman));
+      const feedback = document.getElementById('reader-status');
+      if (feedback) feedback.textContent = roman ? 'Roman reading selected. Copy and Print will use this text.' : 'Original lyrics selected.';
+    }
+    originalScript?.addEventListener('click', () => applyScript(false));
+    romanScript?.addEventListener('click', () => applyScript(true));
+  }
   // ─── Font Size Controls ─────────────────────────────────────────────
   const MIN_SIZE = 16;
   const MAX_SIZE = 40;
@@ -408,7 +465,7 @@ const romanizedLyrics = getRomanizedLyrics(song.lyrics);
 
   copyBtn?.addEventListener('click', async () => {
     try {
-      await navigator.clipboard.writeText(lyricsText);
+      await navigator.clipboard.writeText(readingRoman ? romanLyricsText : lyricsText);
       if (copyText) copyText.textContent = 'Copied!';
       if (readerStatus) readerStatus.textContent = 'Lyrics copied.';
       copyBtn.style.borderColor = 'var(--accent)';

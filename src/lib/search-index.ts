@@ -9,6 +9,7 @@
  */
 import { songs, detectSongLanguage } from './songs';
 import { titleToPhoneticKey, teluguToRoman, hindiToRoman } from './transliterate';
+import { SEARCH_TITLE_ALIASES } from './song-seo';
 
 export interface SearchEntry {
   /** slug */
@@ -34,7 +35,7 @@ export function buildSearchIndex(): SearchEntry[] {
       l: song.title.toLowerCase(),
       p: titleToPhoneticKey(song.title),
       g: langId,
-      r: [langId === 'telugu' ? teluguToRoman(song.title) : langId === 'hindi' ? hindiToRoman(song.title) : song.title, song.slug.replace(/-/g, ' ')],
+      r: [langId === 'telugu' ? teluguToRoman(song.title) : langId === 'hindi' ? hindiToRoman(song.title) : song.title, song.slug.replace(/-/g, ' '), ...(SEARCH_TITLE_ALIASES[song.slug] ? [SEARCH_TITLE_ALIASES[song.slug]] : [])],
     };
   });
 }

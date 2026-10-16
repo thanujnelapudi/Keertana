@@ -11,6 +11,7 @@
 .setlist-page h3 { font-size: 1.1rem; margin-bottom: .75rem; }
 .setlist-page label { display: block; font-size: .85rem; color: var(--text-muted); margin-bottom: .4rem; }
 .setlist-page input { width: 100%; min-width: 0; border: 1px solid var(--border); border-radius: 8px; padding: .8rem; color: var(--text); background: var(--bg); margin-bottom: .65rem; }
+.setlist-page select { width: 100%; max-width: 360px; min-height: 44px; padding: .6rem; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem; }
 .setlist-page button { min-height: 44px; padding: .55rem .8rem; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; cursor: pointer; font-size: .85rem; transition: background .15s, color .15s; }
 .setlist-page button:hover:not(:disabled), #setlist-tabs button[aria-pressed=true] { background: var(--accent-bg); color: var(--accent); border-color: var(--accent); }
 .setlist-page button:disabled { opacity: .5; cursor: default; }

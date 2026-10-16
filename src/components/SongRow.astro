@@ -1,8 +1,9 @@
 ---
-interface Props { song: {slug: string; title: string}; label: string; locale: string; }
-const { song, label, locale } = Astro.props;
+interface Props { song: {slug: string; title: string}; label: string; locale: string; romanTitle?: string; }
+const { song, label, locale, romanTitle } = Astro.props;
 ---
 <a href={`/song/${encodeURIComponent(song.slug)}/`} class="song-row" data-song-slug={song.slug}>
-  <span class="song-row-content"><span class="song-title" lang={locale}>{song.title}</span><span class="song-language">{label}</span></span>
+  <span class="song-row-content"><span class="song-title" lang={locale}>{song.title}</span>{romanTitle && <span class="song-roman-title" lang={`${locale}-Latn`}>{romanTitle}</span>}<span class="song-language">{label}</span></span>
   <span class="browse-saved" hidden>Saved</span><span class="song-arrow" aria-hidden="true">→</span>
 </a>
+<style>.song-roman-title { display: block; font-size: .8125rem; line-height: 1.6; font-weight: 400; color: var(--text-muted); margin-top: .15rem; }</style>

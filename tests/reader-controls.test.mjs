@@ -6,10 +6,10 @@ import vm from 'node:vm';
 const source = readFileSync(new URL('../src/pages/song/[slug].astro', import.meta.url), 'utf8');
 // Select the complete inline script, including comparison operators.
 const body = source.slice(source.indexOf('\n', source.indexOf('<script define:vars=')) + 1, source.lastIndexOf('</script>'));
-function reader(navigator, blocked = false) {
+function reader(navigator, blocked = false, roman = null) {
   const nodes = new Map();
   const node = id => {
-    if (!nodes.has(id)) nodes.set(id, { textContent: '', style: {}, disabled: false, handlers: {}, addEventListener(type, fn) { this.handlers[type] = fn; } });
+    if (!nodes.has(id)) nodes.set(id, { textContent: '', style: {}, disabled: false, handlers: {}, attrs: {}, setAttribute(key, value) { this.attrs[key] = value; }, addEventListener(type, fn) { this.handlers[type] = fn; } });
     return nodes.get(id);
   };
   const sizes = {};
@@ -19,7 +19,7 @@ function reader(navigator, blocked = false) {
     localStorage: { getItem: key => { if (blocked) throw Error('blocked'); return saved.get(key); }, setItem: (key, value) => { if (blocked) throw Error('blocked'); saved.set(key, value); } },
     getComputedStyle: () => ({ getPropertyValue: () => '20px' }),
     navigator, window: { location: { href: 'https://example.test/song/song-a/' }, matchMedia: () => ({ addEventListener() {} }) },
-    lyricsText: 'Actual lyrics\n\nSecond stanza', songTitle: 'Song A', setTimeout() {},
+    lyricsText: 'Actual lyrics\n\nSecond stanza', romanLyricsText: roman, songTitle: 'Song A', setTimeout() {},
   });
   return { node, sizes };
 }
@@ -29,6 +29,18 @@ test('Copy writes only the actual lyrics and gives accessible feedback', async (
   await r.node('copy-lyrics-btn').handlers.click();
   assert.equal(copied, 'Actual lyrics\n\nSecond stanza');
   assert.equal(r.node('reader-status').textContent, 'Lyrics copied.');
+});
+test('Roman selection controls visible text and Copy without changing original lyrics', async () => {
+  let copied;
+  const r = reader({ clipboard: { writeText: async text => copied = text } }, false, 'Roman stanza\n\nNext verse');
+  r.node('roman-script-btn').handlers.click();
+  assert.equal(r.node('lyrics-body').hidden, true);
+  assert.equal(r.node('roman-reading-panel').hidden, false);
+  assert.equal(r.node('roman-script-btn').attrs['aria-pressed'], 'true');
+  await r.node('copy-lyrics-btn').handlers.click(); assert.equal(copied, 'Roman stanza\n\nNext verse');
+  r.node('original-script-btn').handlers.click();
+  assert.equal(r.node('lyrics-body').hidden, false);
+  await r.node('copy-lyrics-btn').handlers.click(); assert.equal(copied, 'Actual lyrics\n\nSecond stanza');
 });
 test('Share falls back to the song URL when native sharing is unavailable', async () => {
   let copied;
