@@ -47,6 +47,11 @@
 .collections-detail-header > .collection-art { flex: 0 0 200px; height: 200px; border-radius: 50%; }
 .collections-detail-header > .collection-art svg { width: 200px; height: 150px; }
 .collection-song-list { max-width: 800px; }
+.collection-result-summary { margin-block: .75rem; font-size: .8125rem; color: var(--text-muted); }
+.collection-pagination { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-top: 1.5rem; }
+.collection-pagination a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; padding: .5rem .75rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); font-size: .875rem; }
+.collection-pagination a[aria-current=page] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.collection-pagination a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .collection-song-list .song-row { display: flex; align-items: center; gap: 1rem; min-height: 88px; padding: 1rem .75rem; border-bottom: 1px solid var(--border); transition: background-color .15s, color .15s; }
 .collection-song-list .song-row:hover, .collection-song-list .song-row:focus-visible { background: var(--surface); color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
 .collection-song-list .song-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }

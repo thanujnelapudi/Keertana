@@ -1,0 +1,49 @@
+---
+import Base from '../layouts/Base.astro';
+import SongRow from './SongRow.astro';
+import CollectionArt from './CollectionArt.astro';
+import { worshipCollections, COLLECTION_PAGE_SIZE, collectionPageUrl } from '../lib/worship-collections';
+import { songs, detectSongLanguage } from '../lib/songs';
+import { SEARCH_TITLE_ALIASES } from '../lib/song-seo';
+import { getRomanReading } from '../lib/roman-reading';
+import '../styles/collections.css';
+interface Props { collection: typeof worshipCollections[number]; page?: number; }
+const { collection, page = 1 } = Astro.props;
+const totalPages = Math.ceil(collection.songs.length / COLLECTION_PAGE_SIZE);
+const offset = (page - 1) * COLLECTION_PAGE_SIZE;
+const bySlug = new Map(songs.map(song => [song.slug, song]));
+const selectedSongs = collection.songs.slice(offset, offset + COLLECTION_PAGE_SIZE).map(slug => {
+  const song = bySlug.get(slug); if (!song) throw new Error(`Missing collection song ${slug}`); return song;
+});
+const site = Astro.site!.href.replace(/\/$/, '');
+const canonical = `${site}${collectionPageUrl(collection.slug, page)}`;
+const pageTitle = `${collection.title}${page > 1 ? ` — Page ${page}` : ''}`;
+const pageNumbers = [...new Set([1, ...Array.from({ length: totalPages }, (_, index) => index + 1).filter(number => Math.abs(number-page) <= 1), totalPages])];
+const jsonLd = [
+  { '@context': 'https://schema.org', '@type': 'CollectionPage', name: pageTitle, description: collection.description, url: canonical },
+  { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Keertana', item: `${site}/` },
+    { '@type': 'ListItem', position: 2, name: 'Collections', item: `${site}/collections/` },
+    { '@type': 'ListItem', position: 3, name: pageTitle, item: canonical },
+  ] },
+  { '@context': 'https://schema.org', '@type': 'ItemList', numberOfItems: collection.songs.length, itemListElement: selectedSongs.map((song,index) => ({ '@type': 'ListItem', position: offset + index + 1, name: song.title, url: `${site}/song/${song.slug}/` })) },
+];
+---
+<Base title={`${pageTitle} – Christian Song Lyrics | Keertana`} description={`${collection.description}${page > 1 ? ` Page ${page} of ${totalPages}.` : ''}`} canonical={canonical} jsonLd={jsonLd}>
+  <div class="container-page worship-collections-page">
+    <nav class="collections-breadcrumb" aria-label="Breadcrumb"><a href="/">Keertana</a><span aria-hidden="true">/</span><a href="/collections/">Collections</a><span aria-hidden="true">/</span><span aria-current="page">{pageTitle}</span></nav>
+    <header class={`collections-detail-header collection-theme-${collection.theme}`}><div class="collections-intro"><p class="collections-eyebrow">{collection.occasion} · {collection.songs.length} songs</p><h1>{collection.title}</h1><p class="collection-native-title" lang="te">{collection.nativeTitle}</p><p>{collection.intro}</p></div><CollectionArt theme={collection.theme} /></header>
+    <p class="collection-result-summary">Showing {offset + 1}–{offset + selectedSongs.length} of {collection.songs.length} songs{page > 1 ? ` · Page ${page}` : ''}</p>
+    <section aria-label={collection.title} class="collection-song-list">{selectedSongs.map(song => {
+      const language = detectSongLanguage(song);
+      return <SongRow song={song} label={language.langLabel} locale={language.langCode} romanTitle={language.langCode !== 'en' ? SEARCH_TITLE_ALIASES[song.slug] || getRomanReading(song.title)?.text : undefined} />;
+    })}</section>
+    {totalPages > 1 && <nav class="collection-pagination" aria-label="Collection pages">
+      {page > 1 && <a rel="prev" href={collectionPageUrl(collection.slug,page-1)}>← Previous</a>}
+      {pageNumbers.map((number,index) => <>{index > 0 && number > pageNumbers[index-1]+1 && <span aria-hidden="true">…</span>}<a href={collectionPageUrl(collection.slug,number)} aria-label={`Page ${number}`} aria-current={number === page ? 'page' : undefined}>{number}</a></>)}
+      {page < totalPages && <a rel="next" href={collectionPageUrl(collection.slug,page+1)}>Next →</a>}
+    </nav>}
+    <section class="collections-guidance"><h2>Prepare your worship set</h2><p>{collection.guidance}</p><a href="/setlists/">Arrange your own setlist →</a><p class="collections-small-note">Open any song and choose “Add to a worship setlist” to place it in your personal song order.</p></section>
+    <nav class="collections-more" aria-label="More worship collections"><h2>Explore another collection</h2>{worshipCollections.filter(c => c.slug !== collection.slug).map(c => <a href={`/collections/${c.slug}/`}>{c.title} →</a>)}</nav>
+  </div>
+</Base>

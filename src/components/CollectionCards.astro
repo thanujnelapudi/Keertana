@@ -1,12 +1,13 @@
 ---
 import CollectionArt from './CollectionArt.astro';
-import { worshipCollections } from '../lib/worship-collections';
+import { worshipCollections, featuredWorshipCollections } from '../lib/worship-collections';
 import '../styles/collections.css';
-interface Props { headingLevel?: 'h2' | 'h3'; }
-const { headingLevel: Heading = 'h2' } = Astro.props;
+interface Props { headingLevel?: 'h2' | 'h3'; featured?: boolean; }
+const { headingLevel: Heading = 'h2', featured = false } = Astro.props;
+const collections = featured ? featuredWorshipCollections : worshipCollections;
 ---
 <div class="worship-collection-grid">
-  {worshipCollections.map(collection => (
+  {collections.map(collection => (
     <a class={`worship-collection-card collection-theme-${collection.theme}`} href={`/collections/${collection.slug}/`}>
       <CollectionArt theme={collection.theme} />
       <div class="collection-card-content">

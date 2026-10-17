@@ -1,40 +1,7 @@
 ---
-import Base from '../../layouts/Base.astro';
-import SongRow from '../../components/SongRow.astro';
-import CollectionArt from '../../components/CollectionArt.astro';
+import CollectionPage from '../../components/CollectionPage.astro';
 import { worshipCollections } from '../../lib/worship-collections';
-import { songs, detectSongLanguage } from '../../lib/songs';
-import { SEARCH_TITLE_ALIASES } from '../../lib/song-seo';
-import { getRomanReading } from '../../lib/roman-reading';
-import '../../styles/collections.css';
 export function getStaticPaths() { return worshipCollections.map(collection => ({ params: { collection: collection.slug }, props: { collection } })); }
 const { collection } = Astro.props;
-const selectedSongs = collection.songs.map(slug => {
-  const song = songs.find(song => song.slug === slug);
-  if (!song) throw new Error(`Collection ${collection.slug}: missing song ${slug}`);
-  return song;
-});
-const site = Astro.site!.href.replace(/\/$/, '');
-const canonical = `${site}/collections/${collection.slug}/`;
-const jsonLd = [
-  { '@context': 'https://schema.org', '@type': 'CollectionPage', name: collection.title, description: collection.description, url: canonical },
-  { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Keertana', item: `${site}/` },
-    { '@type': 'ListItem', position: 2, name: 'Collections', item: `${site}/collections/` },
-    { '@type': 'ListItem', position: 3, name: collection.title, item: canonical },
-  ] },
-  { '@context': 'https://schema.org', '@type': 'ItemList', numberOfItems: selectedSongs.length, itemListElement: selectedSongs.map((song, index) => ({ '@type': 'ListItem', position: index + 1, name: song.title, url: `${site}/song/${song.slug}/` })) },
-];
 ---
-<Base title={`${collection.title} – Christian Song Lyrics | Keertana`} description={collection.description} canonical={canonical} jsonLd={jsonLd}>
-  <div class="container-page worship-collections-page">
-    <nav class="collections-breadcrumb" aria-label="Breadcrumb"><a href="/">Keertana</a><span aria-hidden="true">/</span><a href="/collections/">Collections</a><span aria-hidden="true">/</span><span aria-current="page">{collection.title}</span></nav>
-    <header class={`collections-detail-header collection-theme-${collection.theme}`}><div class="collections-intro"><p class="collections-eyebrow">{collection.occasion} · {selectedSongs.length} songs</p><h1>{collection.title}</h1><p class="collection-native-title" lang="te">{collection.nativeTitle}</p><p>{collection.intro}</p></div><CollectionArt theme={collection.theme} /></header>
-    <section aria-label={collection.title} class="collection-song-list">{selectedSongs.map(song => {
-      const language = detectSongLanguage(song);
-      return <SongRow song={song} label={language.langLabel} locale={language.langCode} romanTitle={language.langCode !== 'en' ? SEARCH_TITLE_ALIASES[song.slug] || getRomanReading(song.title)?.text : undefined} />;
-    })}</section>
-    <section class="collections-guidance"><h2>Prepare your worship set</h2><p>{collection.guidance}</p><a href="/setlists/">Arrange your own setlist →</a><p class="collections-small-note">Open any song and choose “Add to a worship setlist” to place it in your personal song order.</p></section>
-    <nav class="collections-more" aria-label="More worship collections"><h2>Explore another collection</h2>{worshipCollections.filter(c => c.slug !== collection.slug).map(c => <a href={`/collections/${c.slug}/`}>{c.title} →</a>)}</nav>
-  </div>
-</Base>
+<CollectionPage collection={collection} />

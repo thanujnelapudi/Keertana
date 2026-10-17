@@ -9,7 +9,7 @@ const contents = [
   {id:'changes',label:'Changes'}, {id:'contact',label:'Privacy questions'},
 ];
 ---
-<Information title="Privacy Policy" description="What the current Keertana site does with form details, browser storage, and requests to external services." policy contents={contents}>
+<Information title="Privacy Policy" description="What the current Keertana site does with form details, browser storage, and requests to external services." policy updatedAt="2026-10-17" contents={contents}>
   <section id="information" aria-labelledby="information-heading"><h2 id="information-heading">Information and forms</h2>
     <p>You can browse Keertana without an account. There is no account database, login, payment system, advertising integration, or external error-reporting service configured in the application. Vercel Web Analytics is included in production builds to understand site traffic.</p>
     <p>Contribution forms ask for the following details:</p>
@@ -25,6 +25,7 @@ const contents = [
     <p>Form details are used locally to check required fields and formats and prepare an email. Messages you choose to send to keertanasongs@gmail.com can be read for corrections, contribution review and replies. Email can include the form details, your sender address and other information you include. No separate form provider or CMS is connected.</p>
     <p>Browser storage supports returning to saved or recent songs and remembering display preferences. Search matches titles against an index downloaded from this site. Typed search terms are processed in the browser; the current search interface does not send them to an external search service or save them as search history.</p>
     <p>Copying lyrics writes them to your clipboard when you choose Copy. Sharing uses your device’s share feature, where available, or copies the song URL. The destination you choose may handle the shared information under its own practices.</p>
+    {!commentsEnabled && <p>The song-discussion preview is an inactive demonstration. Its fields cannot accept or send information. Visits to the preview and the separate interest-confirmation page are included in ordinary production page-view analytics to understand demand. Choosing the interest link does not submit a comment or create a subscription.</p>}
   </section>
   <section id="storage" aria-labelledby="storage-heading"><h2 id="storage-heading">Cookies and browser storage</h2>
     <p>Cookies use the browser’s cookie mechanism and can accompany requests to a website. Local storage is a separate browser store; Keertana’s saved library is not a cookie and is not automatically sent with page requests.</p>

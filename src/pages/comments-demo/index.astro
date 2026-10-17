@@ -1,0 +1,22 @@
+---
+import Base from '../../layouts/Base.astro';
+import '../../styles/song-comments.css';
+---
+<Base title="Song Discussion Preview | Keertana" description="Preview a possible song discussion feature and let Keertana know if you would use it." noindex>
+  <div class="container-page comments-demo-page" data-comments-demo>
+    <a class="comments-correction-link" data-back-to-song href="/">← Back to the song library</a>
+    <p class="song-comments-eyebrow">A SMALL IDEA FOR THE COMMUNITY</p>
+    <h1>Would you use song comments?</h1>
+    <p data-demo-context hidden></p>
+    <p>A place to discuss pronunciation, suggest a correction, or share a helpful song reference. We’re exploring the idea before opening public comments.</p>
+    <section class="comments-demo-card" aria-labelledby="demo-form-heading">
+      <h2 id="demo-form-heading">A preview of the idea</h2><p class="comments-small">Display only. These fields cannot accept or send information.</p>
+      <fieldset disabled class="comments-form" aria-label="Inactive comment form preview"><label>Display name<input placeholder="Your chosen name" /></label><label>Comment<textarea rows="3" placeholder="A correction, pronunciation question, or reference…"></textarea></label><label>Reference link <span class="comments-optional">(optional)</span><input placeholder="https://" /></label></fieldset>
+      <p class="comments-small">If enabled in the future, comments would be reviewed before appearing publicly.</p>
+    </section>
+    <h2>Would this help you?</h2><p>Your interest will help us decide whether to build this for the community. You are not submitting a comment or signing up for anything.</p>
+    <div class="comments-demo-actions"><a class="comments-button comments-demo-link" data-interest-link href="/comments-demo/interest/">Yes, I’d use song comments →</a><a class="comments-correction-link" data-back-to-song href="/">Return to the song library</a></div>
+    <p class="comments-small">For a correction now, <a data-report-link href="/contribute/report/">send the team a song report</a>.</p>
+  </div>
+</Base>
+<script>import { initCommentsDemo } from '../../scripts/comments-demo.js'; initCommentsDemo();</script>

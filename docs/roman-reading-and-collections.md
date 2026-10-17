@@ -1,5 +1,7 @@
 # Roman reading and worship collections — 16 October 2026
 
+Historical delivery notes. The current reading rules, coverage exceptions, 16 collections, and comment preview are documented in [the 17 October update](reading-collections-comments-demo.md).
+
 ## Delivered
 
 - Automatic Roman reading aids for all 1,195 records containing Telugu/Hindi script in the current 1,307-song catalog. Original English lyrics remain unchanged without a redundant script toggle.

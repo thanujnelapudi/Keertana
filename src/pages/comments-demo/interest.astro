@@ -1,0 +1,12 @@
+---
+import Base from '../../layouts/Base.astro';
+import '../../styles/song-comments.css';
+---
+<Base title="Thanks for Your Interest | Keertana" description="Thanks for helping shape a possible song discussion feature on Keertana." noindex>
+  <div class="container-page comments-demo-page" data-comments-demo>
+    <p class="song-comments-eyebrow">THANK YOU FOR HELPING SHAPE KEERTANA</p><h1>Thanks for your interest.</h1>
+    <p>Public comments are not open yet. Visits to this preview help us understand whether a discussion feature would be useful.</p><p>No comment, personal details, or signup has been submitted.</p>
+    <p data-demo-context hidden></p><div class="comments-demo-actions"><a class="comments-button comments-demo-link" data-back-to-song href="/">Back to the song library →</a><a class="comments-correction-link" data-report-link href="/contribute/report/">Share a correction now</a></div>
+  </div>
+</Base>
+<script>import { initCommentsDemo } from '../../scripts/comments-demo.js'; initCommentsDemo();</script>

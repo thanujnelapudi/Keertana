@@ -1,5 +1,7 @@
 # Public song comments: setup and activation
 
+17 October update: activation is deferred at the owner's request. The live-site plan is an inactive, labelled preview with ordinary Vercel page-view interest measurement. See [demo and measurement instructions](reading-collections-comments-demo.md). Keep `PUBLIC_COMMENTS_ENABLED=false`; the steps below are for a future activation.
+
 16 October 2026. The owner approved Supabase storage/moderation and Cloudflare Turnstile. The implementation is prepared, but no accounts, database, function deployment, or real spam-check widget have been created or connected. Default site builds keep public comments off and retain a useful song-specific correction/reference link. Do not describe the backend as live until the steps and provider checks below pass.
 
 ## 1. Accounts and project

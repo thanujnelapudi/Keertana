@@ -2,6 +2,17 @@
 .song-comments header h2 { font-size: 1.25rem; font-weight: 650; margin-block: .375rem .5rem; letter-spacing: -.02em; }
 .song-comments header > p:last-child { color: var(--text-muted); font-size: .9375rem; line-height: 1.8; }
 .song-comments-eyebrow { color: var(--accent); font-size: .6875rem; letter-spacing: .08em; }
+.comments-demo-badge { display: inline-block; vertical-align: middle; margin-left: .5rem; padding: .15rem .5rem; border-radius: 999px; background: var(--accent-bg); color: var(--accent); font-size: .6875rem; font-weight: 500; letter-spacing: 0; }
+.comments-demo-link { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.comments-demo-page { max-width: 760px; padding-block: 2rem 4rem; }
+.comments-demo-page h1 { font-size: clamp(2rem,5vw,3rem); font-weight: 650; letter-spacing: -.035em; line-height: 1.25; margin-block: .75rem 1rem; }
+.comments-demo-page h2 { font-size: 1.125rem; font-weight: 600; margin-bottom: .5rem; }
+.comments-demo-page > p:not(.song-comments-eyebrow) { color: var(--text-muted); line-height: 1.8; margin-bottom: .75rem; }
+.comments-demo-page [data-demo-context] { color: var(--text) !important; font-size: 1.125rem; }
+.comments-demo-card { padding: 1.5rem; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); margin-block: 1.75rem; }
+.comments-demo-card fieldset { padding: 0; border: 0; }
+.comments-demo-card :disabled { opacity: .75; cursor: not-allowed; }
+.comments-demo-actions { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; align-items: center; margin-block: .75rem; }
 .song-comments [hidden] { display: none !important; }
 .comments-button { min-height: 44px; padding: .625rem 1rem; margin-top: .75rem; border: 1px solid var(--accent); border-radius: 9px; background: var(--accent); color: var(--on-accent); font: inherit; font-size: .875rem; font-weight: 600; cursor: pointer; }
 .comments-secondary { background: var(--surface); color: var(--accent); border-color: var(--border); }

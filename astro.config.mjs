@@ -11,7 +11,7 @@ export default defineConfig({
     sitemap({
       filter: (page) => {
         // Exclude redirect routes and offline page from sitemap
-        return !page.includes('/songs/') && !page.includes('/offline/') && !page.includes('/setlists/') && !page.includes('/api/');
+        return !page.includes('/songs/') && !page.includes('/offline/') && !page.includes('/setlists/') && !page.includes('/api/') && !page.includes('/comments-demo/');
       },
     }),
   ],

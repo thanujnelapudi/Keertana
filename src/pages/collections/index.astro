@@ -1,12 +1,13 @@
 ---
 import Base from '../../layouts/Base.astro';
 import CollectionCards from '../../components/CollectionCards.astro';
+import { collectionDecisions, worshipCollections } from '../../lib/worship-collections';
 import '../../styles/collections.css';
 ---
-<Base title="Christian Worship Song Collections | Keertana" description="Explore Christian song collections for Christmas, praise, thanksgiving, Good Friday, prayer, and hope. Find Telugu and English lyrics for your worship.">
+<Base title="Christian Worship Song Collections | Keertana" description={`Explore ${worshipCollections.length} Christian song collections covering all ${collectionDecisions.length} Telugu songs, from worship and prayer to grace, love, Christmas, and Easter.`}>
   <div class="container-page worship-collections-page">
     <nav class="collections-breadcrumb" aria-label="Breadcrumb"><a href="/">Keertana</a><span aria-hidden="true">/</span><span aria-current="page">Collections</span></nav>
-    <header class="collections-intro"><p class="collections-eyebrow">SONGS FOR YOUR GATHERING</p><h1>Find the songs<br />for this moment.</h1><p>Small, purposeful selections from Keertana’s library. Read a song, choose what fits, and bring your worship set together.</p></header>
+    <header class="collections-intro"><p class="collections-eyebrow">{worshipCollections.length} COLLECTIONS · ALL {collectionDecisions.length} TELUGU SONGS</p><h1>Find the songs<br />for this moment.</h1><p>Explore by worship theme or occasion. Every Telugu song has a home here; Faith & Devotion brings together the wider library. Some songs appear in more than one collection.</p></header>
     <CollectionCards />
     <section class="collections-guidance"><h2>Make the selection yours</h2><p>These public collections are starting points. Your personal setlists let you choose songs from any language and arrange them in the order you’ll sing.</p><a href="/setlists/">Open your worship setlists →</a></section>
   </div>

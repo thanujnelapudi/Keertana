@@ -12,7 +12,8 @@ if (enabled) {
 }
 ---
 <section class="song-comments" data-pagefind-ignore aria-labelledby="song-comments-heading" data-comments-enabled={enabled ? 'true' : 'false'} data-song={song.slug} data-endpoint={enabled ? endpoint : undefined} data-site-key={enabled ? siteKey : undefined}>
-  <header><p class="song-comments-eyebrow">HELP EACH OTHER WORSHIP</p><h2 id="song-comments-heading">{enabled ? 'Song discussion' : 'Help improve this song'}</h2><p>{enabled ? 'Share a pronunciation correction, ask about this song, or suggest a reference. Comments appear after review.' : 'Know a correction or a useful reference for this song? Share it with the Keertana team.'}</p></header>
+  <header><p class="song-comments-eyebrow">HELP EACH OTHER WORSHIP</p><h2 id="song-comments-heading">Song discussion {!enabled && <span class="comments-demo-badge">Preview</span>}</h2><p>{enabled ? 'Share a pronunciation correction, ask about this song, or suggest a reference. Comments appear after review.' : 'Would a discussion below each song help you? Preview the idea and tell us if you would use it. Public commenting is not active.'}</p></header>
+  {!enabled && <a class="comments-button comments-demo-link" href={`/comments-demo/?song=${encodeURIComponent(song.slug)}`}>Preview song comments →</a>}
   {enabled ? <>
     <button class="comments-button comments-secondary" type="button" data-load-comments>View song discussion</button>
     <p class="comments-status" data-comments-list-status role="status" aria-live="polite"></p>

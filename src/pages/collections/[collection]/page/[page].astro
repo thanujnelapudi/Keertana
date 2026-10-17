@@ -1,0 +1,9 @@
+---
+import CollectionPage from '../../../../components/CollectionPage.astro';
+import { worshipCollections, COLLECTION_PAGE_SIZE } from '../../../../lib/worship-collections';
+export function getStaticPaths() {
+  return worshipCollections.flatMap(collection => Array.from({ length: Math.max(0, Math.ceil(collection.songs.length / COLLECTION_PAGE_SIZE) - 1) }, (_,index) => ({ params: { collection: collection.slug, page: String(index + 2) }, props: { collection, page: index + 2 } })));
+}
+const { collection, page } = Astro.props;
+---
+<CollectionPage collection={collection} page={page} />

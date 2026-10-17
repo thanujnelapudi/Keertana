@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import { getRomanReading } from '../src/lib/roman-reading.ts';
-import { worshipCollections } from '../src/lib/worship-collections.ts';
+import { worshipCollections, featuredWorshipCollections, COLLECTION_PAGE_SIZE, collectionPageUrl } from '../src/lib/worship-collections.ts';
 const out = process.argv[2] || 'dist';
 const songs = JSON.parse(await readFile('src/data/songs.json', 'utf8'));
 let checkedRoman = 0;
@@ -25,13 +25,19 @@ const collectionsIndex = await readFile(path.join(out, 'collections', 'index.htm
 assert.ok(homepage.includes('id="worship-collections"'), 'Homepage collection section is missing');
 for (const collection of worshipCollections) {
   const route = `/collections/${collection.slug}/`;
-  assert.ok(homepage.includes(`href="${route}"`), `Missing homepage collection card: ${route}`);
+  if (featuredWorshipCollections.includes(collection)) assert.ok(homepage.includes(`href="${route}"`), `Missing homepage collection card: ${route}`);
   assert.ok(collectionsIndex.includes(`href="${route}"`), `Missing collections index card: ${route}`);
-  const html = await readFile(path.join(out, 'collections', collection.slug, 'index.html'), 'utf8');
-  assert.ok(sitemap.includes(route), `Collection not in sitemap: ${route}`);
-  assert.ok(!/<meta[^>]+name="robots"[^>]+noindex/.test(html));
+  for (let page = 1; page <= Math.ceil(collection.songs.length / COLLECTION_PAGE_SIZE); page++) {
+    const pageRoute = collectionPageUrl(collection.slug, page);
+    const html = await readFile(path.join(out, pageRoute, 'index.html'), 'utf8');
+    assert.ok(sitemap.includes(pageRoute), `Collection not in sitemap: ${pageRoute}`);
+    assert.ok(html.includes(`rel="canonical" href="https://keertana.vercel.app${pageRoute}"`), `Wrong canonical: ${pageRoute}`);
+    assert.ok(!/<meta[^>]+name="robots"[^>]+noindex/.test(html));
+    const selected = collection.songs.slice((page-1)*COLLECTION_PAGE_SIZE,page*COLLECTION_PAGE_SIZE);
+    for (const slug of selected) assert.ok(html.includes(`/song/${slug}/`), `Collection page misses song ${slug}`);
+    if (page*COLLECTION_PAGE_SIZE < collection.songs.length) assert.ok(html.includes(`href="${collectionPageUrl(collection.slug,page+1)}"`), 'Missing next page');
+  }
   for (const slug of collection.songs) {
-    assert.ok(html.includes(`/song/${slug}/`), `Collection misses song ${slug}`);
     const reader = await readFile(path.join(out, 'song', slug, 'index.html'), 'utf8');
     assert.ok(reader.includes(route), `Missing return link ${slug}`);
   }
