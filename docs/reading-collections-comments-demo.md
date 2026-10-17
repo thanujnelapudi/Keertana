@@ -1,5 +1,7 @@
 # Reading, collections, and comment-interest preview — 17 October 2026
 
+**Current status:** the owner subsequently withdrew the comments experiment. The song discussion section, both demo routes, and interest navigation were removed. The comments-related delivery and measurement notes below are historical, not active features. Transliteration and collection improvements remain in place.
+
 ## Scope
 
 Existing static Astro site preserved. No catalog records or source lyrics imported, edited, or deleted. No new runtime dependency, paid service, account, or active public-comment submission added. The prepared moderated-comments backend remains disabled.
