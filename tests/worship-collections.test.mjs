@@ -18,7 +18,7 @@ test('Related songs use collection membership, exclude self, and stay bounded', 
   const related = relatedSongSlugs(slug);
   assert.ok(related.length > 0 && related.length <= 4); assert.ok(!related.includes(slug));
   assert.equal(new Set(related).size, related.length);
-  assert.equal(collectionsForSong(slug)[0].slug, 'christmas');
+  assert.equal(collectionsForSong(slug)[0].slug, worshipCollections[0].slug);
   assert.deepEqual(relatedSongSlugs('not-in-a-collection'), []);
 });
 

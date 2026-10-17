@@ -2,6 +2,14 @@ import catalog from '../data/songs.json' with { type: 'json' };
 import { scoreSongThemes } from './song-themes.ts';
 const curatedCollections = [
   {
+    slug: 'sunday-school', title: 'Sunday School Songs', nativeTitle: 'ఆదివారం బడి పాటలు',
+    theme: 'thanksgiving', occasion: 'Sing, learn, and grow', summary: 'Simple songs for children, Sunday School, and family worship.',
+    description: 'Telugu and English Sunday School song lyrics for children, teachers, and family worship. Read, print, and arrange songs in your own setlist.',
+    intro: 'A selection of Telugu children’s songs and traditional English children’s hymns for Sunday School and family worship. Choose familiar words for your children’s age group and read each song together before singing.',
+    guidance: 'Start with one short song and explain its meaning in words the children understand. Use the reader to enlarge or print the lyrics, then arrange the songs you need in your own worship setlist.',
+    songs: ['chitti-potti-paapanu-nenu', 'chinna-gorrepillanu-nenu', 'chinna-chinna-gorrepillanu', 'chinni-chinni-chethulatho', 'chinni-manasutho-ninnu', 'naa-chinni-hrudayamandu', 'naalaanti-chinnalante', 'pillalaaraa', 'jesus-loves-me', 'jesus-loves-the-little-children', 'jesus-bids-us-shine'],
+  },
+  {
     slug: 'christmas', title: 'Christmas Songs', nativeTitle: 'క్రిస్మస్ పాటలు',
     theme: 'christmas', occasion: 'Celebrate His birth', summary: 'Songs of joy for the birth of Jesus.',
     description: 'Telugu Christian Christmas songs for celebrating the birth of Jesus, with lyrics for reading, singing, and preparing a worship set.',
@@ -123,7 +131,7 @@ export const collectionDecisions = teluguSongs.map(song => {
 });
 const titles = new Map(catalog.map(song => [song.slug, song.title]));
 export const worshipCollections = curatedCollections.map(collection => ({ ...collection, songs: [...membership.get(collection.slug)!].sort((a,b) => titles.get(a)!.localeCompare(titles.get(b)!, 'te')) }));
-export const featuredWorshipCollections = worshipCollections.slice(0, 6);
+export const featuredWorshipCollections = worshipCollections.filter(collection => collection.slug !== 'sunday-school').slice(0, 6);
 export const COLLECTION_PAGE_SIZE = 36;
 export function collectionPageUrl(slug: string, page = 1) { return page === 1 ? `/collections/${slug}/` : `/collections/${slug}/page/${page}/`; }
 const bySong = new Map<string, typeof worshipCollections>();

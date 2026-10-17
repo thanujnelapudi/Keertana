@@ -1,6 +1,6 @@
 // Keertana Service Worker
 // Caching strategy: precache essentials, stale-while-revalidate for visited pages
-const CACHE_VERSION = 'keertana-v12-comments-removed';
+const CACHE_VERSION = 'keertana-v13-sunday-school';
 const PRECACHE = [
   '/',
   '/offline/',
