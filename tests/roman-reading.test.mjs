@@ -33,6 +33,7 @@ test('Telugu reading keeps long ee/oo distinct from e/o and handles devotional w
 test('Hindi handles schwa deletion, explicit vowels, nukta and common exceptions', () => {
   for (const [native, expected] of Object.entries({ करना:'karnaa', करता:'kartaa', जीवन:'jeevan', खुशी:'khushee', 'फ़रिश्ता':'farishtaa', 'आवाज़':'aavaaz', परमेश्वर:'parmeshwar', पवित्र:'pavitra' })) assert.equal(hindiReading(native), expected, native);
   assert.equal(getRomanReading('यीशु १२\n\nप्रेम YESHU').text, 'yeeshu 12\n\nprem YESHU');
+  assert.equal(getRomanReading('जीवन।प्रेम॥परमेश्वर१२').text, 'jeevan|prem|parmeshwar12');
 });
 
 test('Reader rules never replace legacy title search and slug conventions', () => {

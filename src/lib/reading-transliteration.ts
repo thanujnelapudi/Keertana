@@ -37,6 +37,9 @@ export function teluguReading(run: string) {
 
 export function hindiReading(run: string) {
   const normalized = run.normalize('NFC').replace(joins, '');
+  // Danda and numerals are boundaries, not syllables in the preceding word.
+  // Keep schwa deletion independent of punctuation, including unspaced refrains.
+  if (/[०-९।॥]/.test(normalized)) return normalized.split(/([०-९।॥]+)/).map(part => /^[०-९।॥]+$/.test(part) ? part.replace(/[०-९]/g, ch => String(ch.charCodeAt(0) - 0x0966)).replace(/[।॥]/g, '|') : hindiReading(part)).join('');
   if (hiWords[normalized]) return hiWords[normalized];
   const chars = Array.from(normalized.normalize('NFD'));
   const syllables: Array<{ consonant: string; vowel: string; inherent: boolean; dead: boolean; mark: string }> = [];

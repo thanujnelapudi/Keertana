@@ -44,3 +44,11 @@ This uses normal page views because [Vercel custom events require Pro or Enterpr
 [Google Search Console performance](https://support.google.com/webmasters/answer/7576553?hl=en) measures search visibility and clicks from Google; it cannot show these on-site button clicks. No production experiment clicks should be made during QA because they could inflate the counts. Local preview builds do not send production analytics.
 
 Future activation still requires separately configuring and testing the approved moderated-comments services; see `docs/song-comments-setup.md`. Do not change `PUBLIC_COMMENTS_ENABLED=false` just to run this demo.
+
+## Verification
+
+- 60 regression tests passed, covering title search, reader controls, local library, setlists, song entry, contribution email preparation, prepared comment handlers, new reading rules, collection coverage, and the inactive demo's safe context links.
+- Production Astro and Pagefind builds passed. The index contains the existing 1,307 song pages across three languages.
+- Built-output audits passed for all 1,307 song pages and APIs, all 1,307 legacy redirects, collection pages/canonicals/sitemap entries, and disabled-comment/demo configuration.
+- Browser checks covered the updated reading toggle, original-lyrics preservation, six homepage cards versus 16 directory cards, 36-song pagination, song-specific demo/interest/back links, disabled preview fields, keyboard activation, and error-free navigation. Responsive checks included 390px collections and a 320px demo, plus light/dark display; no horizontal overflow was observed in those checks.
+- Catalog content matches the committed source; the owner's existing formatting-only changes in `src/data/songs.json` were preserved outside the implementation commits.
