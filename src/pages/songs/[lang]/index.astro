@@ -1,12 +1,13 @@
 ---
 import { getLanguagesData, songs } from '../../../lib/songs';
+import { LEGACY_SONG_ALIASES } from '../../../lib/legacy-song-aliases';
 
 export function getStaticPaths() {
   const languages = getLanguagesData();
   return [
     ...languages.map(lang => ({ params: { lang: lang.id }, props: { destination: `/${lang.id}/` } })),
     ...songs.map(song => ({ params: { lang: song.slug }, props: { destination: `/song/${song.slug}/` } })),
-    { params: { lang: 'athyunnatha-simhasanamupai' }, props: { destination: '/song/athyunnatha-simhaasanamupai/' } },
+    ...Object.entries(LEGACY_SONG_ALIASES).map(([legacy,canonical]) => ({ params: { lang: legacy }, props: { destination: `/song/${canonical}/` } })),
   ];
 }
 
