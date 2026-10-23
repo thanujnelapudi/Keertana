@@ -663,6 +663,7 @@ const LANGS_JSON = JSON.stringify(
     if (searchInput.value.trim() !== query) return;
     const topMatches = searchTitles(index, query);
     renderTitleSuggestions(topMatches, query);
+    document.dispatchEvent(new CustomEvent('keertana:search-results', { detail: { source: 'home', count: topMatches.length } }));
   }
 
   function renderTitleSuggestions(matches, query) {

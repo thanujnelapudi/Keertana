@@ -383,6 +383,7 @@
     input.removeAttribute('aria-activedescendant');
     modalActiveIndex = -1;
     const top = searchTitles(index, query);
+    document.dispatchEvent(new CustomEvent('keertana:search-results', { detail: { source: 'dialog', count: top.length } }));
 
     if (top.length === 0) {
       suggestionsUl.innerHTML = `<li class="dialog-initial-state">No songs found matching "${escapeHtml(query)}".</li>`;

@@ -5,6 +5,7 @@ import '../styles/global.css';
 import SearchDialog from '../components/SearchDialog.astro';
 import BrandLogo from '../components/BrandLogo.astro';
 import Analytics from '@vercel/analytics/astro';
+import UsageAnalytics from '../components/UsageAnalytics.astro';
 
 interface Props {
   title: string;
@@ -230,6 +231,7 @@ const year = new Date().getFullYear();
           <a href="#top" class="footer-back-top">↑ Back to top</a>
         </div>
       </div>
+      <div class="container-page"><UsageAnalytics /></div>
     </footer>
 
     <style>

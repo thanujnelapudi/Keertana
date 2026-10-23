@@ -1,0 +1,24 @@
+---
+const id = import.meta.env.PUBLIC_GA_MEASUREMENT_ID || '';
+const enabled = import.meta.env.PROD && /^G-[A-Z0-9]+$/.test(id);
+---
+{enabled && <>
+  <button type="button" id="analytics-settings" class="analytics-settings">Analytics preferences</button>
+  <section id="analytics-choice" class="analytics-choice" aria-labelledby="analytics-heading" hidden>
+    <h2 id="analytics-heading">Help improve Keertana</h2>
+    <p>Allow optional Google Analytics cookies to measure visits, search outcomes and collection use? We do not send typed searches or private setlist details. <a href="/privacy/#services">Privacy details</a></p>
+    <div><button type="button" data-analytics-choice="denied">No thanks</button><button type="button" data-analytics-choice="granted">Allow analytics</button></div>
+  </section>
+  <script is:inline defer src="/usage-analytics.js" data-measurement-id={id}></script>
+</>}
+<style>
+  .analytics-settings { background: transparent; border: 0; color: var(--text-muted); font: inherit; text-decoration: underline; padding: .75rem 0; min-height: 44px; cursor: pointer; }
+  .analytics-choice { position: fixed; bottom: 1rem; inset-inline: 1rem; margin-inline: auto; max-width: 34rem; max-height: 80vh; overflow: auto; z-index: 150; padding: 1rem 1.25rem; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); box-shadow: 0 4px 24px #0002; }
+  .analytics-choice[hidden] { display: none; }
+  .analytics-choice h2 { font-size: 1rem; margin: 0 0 .5rem; }
+  .analytics-choice p { font-size: .875rem; line-height: 1.6; margin: 0 0 .75rem; }
+  .analytics-choice div { display: flex; gap: .75rem; flex-wrap: wrap; }
+  .analytics-choice button { min-height: 44px; padding: .5rem 1rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); cursor: pointer; }
+  .analytics-choice button:last-child { background: var(--accent); color: white; }
+  @media print { .analytics-choice, .analytics-settings { display: none !important; } }
+</style>
