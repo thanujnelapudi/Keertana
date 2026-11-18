@@ -37,7 +37,6 @@ const description = `Explore ${letterSongs.length} ${lang.label} Christian worsh
 
 const PER_PAGE = 24;
 const totalPages = Math.ceil(letterSongs.length / PER_PAGE);
-const initialSongs = letterSongs.slice(0, PER_PAGE);
 
 const jsonLd = [
   {
@@ -62,7 +61,7 @@ const jsonLd = [
     '@type': 'ItemList',
     name: `${lang.label} Songs - '${letter.char}'`,
     numberOfItems: letterSongs.length,
-    itemListElement: initialSongs.map((s, i) => ({
+    itemListElement: letterSongs.map((s, i) => ({
       '@type': 'ListItem',
       position: i + 1,
       name: s.title,
@@ -71,7 +70,6 @@ const jsonLd = [
   },
 ];
 
-const songsData = letterSongs.map((s) => ({ slug: s.slug, title: s.title }));
 ---
 
 <Base
@@ -188,7 +186,7 @@ const songsData = letterSongs.map((s) => ({ slug: s.slug, title: s.title }));
           Songs starting with '{letter.char}'
         </h3>
         <span id="song-count-badge" style="font-size: 0.8125rem; color: var(--text-faint);">
-          Showing 1–{Math.min(initialSongs.length, letterSongs.length)} of {letterSongs.length}
+          Showing 1–{letterSongs.length} of {letterSongs.length}
         </span>
       </div>
 
@@ -197,7 +195,7 @@ const songsData = letterSongs.map((s) => ({ slug: s.slug, title: s.title }));
         display: grid;
         grid-template-columns: 1fr;
       ">
-        {initialSongs.map((song) => (
+        {letterSongs.map((song) => (
           <SongRow song={song} label={lang.label} locale={lang.locale} />
         ))}
       </div>
@@ -209,6 +207,7 @@ const songsData = letterSongs.map((s) => ({ slug: s.slug, title: s.title }));
             id="load-more-btn"
             type="button"
             class="load-more-button"
+            hidden
           >
             Load more songs
           </button>
@@ -244,6 +243,7 @@ const songsData = letterSongs.map((s) => ({ slug: s.slug, title: s.title }));
 </Base>
 
 <style>
+  :global(#song-list .song-row[hidden]), .load-more-button[hidden] { display: none; }
   .alpha-grid {
     display: flex;
     flex-wrap: wrap;
@@ -354,36 +354,25 @@ const songsData = letterSongs.map((s) => ({ slug: s.slug, title: s.title }));
   }
 </style>
 
-<script define:vars={{ allSongs: songsData }}>
+<script>
   const PER_PAGE = 24;
-  let loadedCount = Math.min(PER_PAGE, allSongs.length);
-  const totalCount = allSongs.length;
-
   const loadMoreBtn = document.getElementById('load-more-btn');
-  const songList = document.getElementById('song-list');
+  const rows = Array.from(document.querySelectorAll<HTMLAnchorElement>('#song-list .song-row'));
+  const totalCount = rows.length;
+  let loadedCount = Math.min(PER_PAGE, totalCount);
   const badge = document.getElementById('song-count-badge');
 
+  function updateRows() {
+    rows.forEach((row, index) => { row.hidden = index >= loadedCount; });
+    if (badge) badge.textContent = `Showing 1–${loadedCount} of ${totalCount}`;
+    if (loadMoreBtn) loadMoreBtn.hidden = loadedCount >= totalCount;
+  }
+
+  updateRows();
   loadMoreBtn?.addEventListener('click', () => {
-    const nextBatch = allSongs.slice(loadedCount, loadedCount + PER_PAGE);
-    const fragment = document.createDocumentFragment();
-
-    for (const song of nextBatch) {
-      const a = document.createElement('a');
-      a.href = `/song/${encodeURIComponent(song.slug)}/`;
-      a.className = 'song-row';
-      a.innerHTML = `<span class="song-title">${song.title}</span><span class="song-arrow" aria-hidden="true">→</span>`;
-      fragment.appendChild(a);
-    }
-    songList.appendChild(fragment);
-
-    loadedCount += nextBatch.length;
-
-    if (badge) {
-      badge.textContent = `Showing 1–${loadedCount} of ${totalCount}`;
-    }
-
-    if (loadedCount >= totalCount) {
-      loadMoreBtn.style.display = 'none';
-    }
+    const firstNewRow = rows[loadedCount];
+    loadedCount = Math.min(loadedCount + PER_PAGE, totalCount);
+    updateRows();
+    firstNewRow?.focus();
   });
 </script>

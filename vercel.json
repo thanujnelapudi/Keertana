@@ -1,6 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "redirects": [
+    { "source": "/songs/edhigo-deva-naa-jeevitham", "destination": "/song/idigo-deva-naa-jeevitham/", "statusCode": 301 },
+    { "source": "/songs/edhigo-deva-naa-jeevitham/", "destination": "/song/idigo-deva-naa-jeevitham/", "statusCode": 301 },
     { "source": "/songs", "destination": "/", "statusCode": 301 },
     { "source": "/songs/", "destination": "/", "statusCode": 301 },
     { "source": "/songs/naa-sthuthi-patruda", "destination": "/song/naa-sthuthi-paathrudaa/", "statusCode": 301 },

@@ -22,7 +22,7 @@ const canonical = `${siteUrl}/song/${song.slug}/`;
 
 const lyricLines = song.lyrics.split('\n').map((l) => l.trim()).filter(Boolean);
 const cleanSnippet = lyricLines.slice(0, 2).join(' ').slice(0, 140);
-const { title, romanTitle } = songSearchTitle(song, langInfo.langLabel);
+const { title, romanTitle, romanTitleLang } = songSearchTitle(song, langInfo.langLabel);
 const description = `Read ${song.title}${romanTitle ? ` (${romanTitle})` : ''}, a ${langInfo.langLabel} Christian worship song, on Keertana. ${cleanSnippet}`;
 
 const ogLocale = langInfo.langCode === 'te' ? 'te_IN' : langInfo.langCode === 'hi' ? 'hi_IN' : 'en_US';
@@ -88,7 +88,7 @@ const relatedSongs = relatedSongSlugs(song.slug).map(slug => songs.find(s => s.s
         color: var(--text);
         margin: 0 0 1.25rem;
       ">{song.title}</h1>
-      {romanTitle && <p class="reader-title-alias" lang="en">{romanTitle} · {langInfo.langLabel} lyrics</p>}
+      {romanTitle && <p class="reader-title-alias"><span lang={romanTitleLang}>{romanTitle}</span> · {langInfo.langLabel} lyrics</p>}
 
       <!-- Toolbar: Font size controls + Copy + Share -->
       <div class="song-toolbar" style="

@@ -1,6 +1,13 @@
+import { getRomanReading } from './roman-reading';
+
 // Curated title spellings for pages identified in Search Console. These describe
 // existing songs only; they are not credits, translations, or content claims.
 export const SEARCH_TITLE_ALIASES: Record<string, string> = {
+  'arhatha-lekunnaa-preminchaavu': 'Arhatha Lekunna Preminchavu',
+  'yaakobu-baavi-kaada': 'Yaakobu Baavi Kaada',
+  'naa-sthuthi-paathrudaa': 'Naa Sthuthi Patruda',
+  'nee-krupaathishayamu': 'Nee Krupaathishayamu',
+  'nannu-kaavaga-vachchina': 'Nannu Kaavaga Vachchina',
   'neethi-sooryudaa-yesu': 'Neethi Suryuda Yesu',
   'nenemainaa-prabhuvaa': 'Nenemaina Prabhuva',
   'deevinchaave': 'Deevinchaave',
@@ -13,9 +20,11 @@ export const SEARCH_TITLE_ALIASES: Record<string, string> = {
   'aashapadaku-ee-lokam-kosam': 'Aashapadaku Ee Lokam Kosam',
 };
 export function songSearchTitle(song: { slug: string; title: string }, language: string) {
-  const romanTitle = SEARCH_TITLE_ALIASES[song.slug];
+  const reading = getRomanReading(song.title);
+  const romanTitle = SEARCH_TITLE_ALIASES[song.slug] ?? reading?.text.trim();
   return {
     romanTitle,
+    romanTitleLang: reading?.lang ?? 'und-Latn',
     title: romanTitle
       ? `${song.title} (${romanTitle}) – ${language} Lyrics | Keertana`
       : `${song.title} – ${language} Christian Song Lyrics | Keertana`,

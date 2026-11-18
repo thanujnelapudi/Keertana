@@ -227,6 +227,17 @@ const songsData = lang.songs.map((s) => ({ slug: s.slug, title: s.title }));
         ))}
       </div>
 
+      {totalPages > 1 && (
+        <details class="catalog-page-links">
+          <summary>Jump to a page</summary>
+          <nav aria-label={`${lang.label} song catalog pages`}>
+            {Array.from({ length: totalPages - 1 }, (_, index) => index + 2).map(page => (
+              <a href={`/${lang.id}/page/${page}/`} aria-label={`Page ${page}`}>{page}</a>
+            ))}
+          </nav>
+        </details>
+      )}
+
       <!-- Load More / Progressive Enhancement -->
       {totalPages > 1 && (
         <div id="load-more-container" style="margin-top: 3rem; text-align: center;">
@@ -253,6 +264,19 @@ const songsData = lang.songs.map((s) => ({ slug: s.slug, title: s.title }));
 </Base>
 
 <style>
+  .catalog-page-links { margin-block: 1.5rem; }
+  .catalog-page-links summary { cursor: pointer; width: fit-content; padding-block: .75rem; }
+  .catalog-page-links nav { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .catalog-page-links a {
+    display: grid;
+    place-items: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    border: 1px solid var(--border);
+    border-radius: .5rem;
+    color: var(--accent);
+  }
+
   .browse-section:has(#local-library:not([hidden])) { padding-top: 2rem !important; }
   .lang-tab[aria-selected="true"] {
     color: var(--accent) !important;
