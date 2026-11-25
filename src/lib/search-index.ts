@@ -9,7 +9,7 @@
  */
 import { songs, detectSongLanguage } from './songs';
 import { titleToPhoneticKey, teluguToRoman, hindiToRoman } from './transliterate';
-import { SEARCH_TITLE_ALIASES } from './song-seo';
+import { SEARCH_TITLE_ALIASES, getSongReference } from './song-seo';
 
 export interface SearchEntry {
   /** slug */
@@ -29,13 +29,20 @@ export interface SearchEntry {
 export function buildSearchIndex(): SearchEntry[] {
   return songs.map((song) => {
     const { langId } = detectSongLanguage(song);
+    const { refrains, recording } = getSongReference(song);
     return {
       s: song.slug,
       t: song.title,
       l: song.title.toLowerCase(),
       p: titleToPhoneticKey(song.title),
       g: langId,
-      r: [langId === 'telugu' ? teluguToRoman(song.title) : langId === 'hindi' ? hindiToRoman(song.title) : song.title, song.slug.replace(/-/g, ' '), ...(SEARCH_TITLE_ALIASES[song.slug] ? [SEARCH_TITLE_ALIASES[song.slug]] : [])],
+      r: [
+        langId === 'telugu' ? teluguToRoman(song.title) : langId === 'hindi' ? hindiToRoman(song.title) : song.title,
+        song.slug.replace(/-/g, ' '),
+        ...(SEARCH_TITLE_ALIASES[song.slug] ? [SEARCH_TITLE_ALIASES[song.slug]] : []),
+        ...refrains.flatMap(({ native, roman }) => [native, roman]),
+        ...(recording ? [recording.title] : []),
+      ],
     };
   });
 }

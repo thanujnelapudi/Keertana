@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import '../../styles/print.css';
 import { songs, detectSongLanguage } from '../../lib/songs';
 import { getRomanizedLyrics } from '../../lib/transliterate';
-import { songSearchTitle } from '../../lib/song-seo';
+import { songSearchTitle, getSongReference, teluguSongDescription } from '../../lib/song-seo';
 import { getRomanReading } from '../../lib/roman-reading';
 import { collectionsForSong, relatedSongSlugs } from '../../lib/worship-collections';
 
@@ -23,7 +23,11 @@ const canonical = `${siteUrl}/song/${song.slug}/`;
 const lyricLines = song.lyrics.split('\n').map((l) => l.trim()).filter(Boolean);
 const cleanSnippet = lyricLines.slice(0, 2).join(' ').slice(0, 140);
 const { title, romanTitle, romanTitleLang } = songSearchTitle(song, langInfo.langLabel);
-const description = `Read ${song.title}${romanTitle ? ` (${romanTitle})` : ''}, a ${langInfo.langLabel} Christian worship song, on Keertana. ${cleanSnippet}`;
+const romanReading = getRomanReading(song.lyrics);
+const { refrains, recording } = getSongReference(song);
+const description = langInfo.langId === 'telugu'
+  ? teluguSongDescription(song, romanTitle, Boolean(romanReading))
+  : `Read ${song.title}${romanTitle ? ` (${romanTitle})` : ''}, a ${langInfo.langLabel} Christian worship song, on Keertana. ${cleanSnippet}`;
 
 const ogLocale = langInfo.langCode === 'te' ? 'te_IN' : langInfo.langCode === 'hi' ? 'hi_IN' : 'en_US';
 
@@ -51,7 +55,6 @@ const jsonLd = [
 ];
 
 const romanizedLyrics = getRomanizedLyrics(song.lyrics);
-const romanReading = getRomanReading(song.lyrics);
 const songCollections = collectionsForSong(song.slug);
 const relatedSongs = relatedSongSlugs(song.slug).map(slug => songs.find(s => s.slug === slug)).filter(Boolean);
 ---
@@ -210,6 +213,17 @@ const relatedSongs = relatedSongSlugs(song.slug).map(slug => songs.find(s => s.s
     </article>
     <p class="print-attribution">Keertana · Song credit and rights belong to the respective creators and rights holders.</p>
 
+    {(refrains.length > 0 || recording) && <section class="reader-discovery" aria-labelledby="refrain-heading" lang="en">
+      <h2 id="refrain-heading">Find this song by its refrain</h2>
+      {refrains.length > 0 && <ul>{refrains.map(({ native, roman }) => <li>
+        <span lang="te">{native}</span> · <span lang="te-Latn">{roman}</span>
+      </li>)}</ul>}
+      {recording && <p class="reader-recording">
+        <a href={recording.url}>Listen to <span lang="te-Latn">{recording.title}</span> on YouTube</a>.
+        The recording credits {recording.lyricsAndTune} for the lyrics and tune.
+      </p>}
+    </section>}
+
     {songCollections.length > 0 && <section class="reader-discovery" aria-label="Worship collections">
       <h2>Find your next song</h2>
       <p>Explore this song with others for the same worship occasion.</p>
@@ -272,6 +286,7 @@ const relatedSongs = relatedSongSlugs(song.slug).map(slug => songs.find(s => s.s
   .reader-discovery { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
   .reader-discovery h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
   .reader-discovery p { font-size: 0.875rem; color: var(--text-muted); }
+  .reader-recording a { color: var(--accent); text-decoration: underline; text-underline-offset: .18em; }
   .reader-discovery ul { list-style: none; padding: 0; }
   .reader-discovery li a { display: block; padding-block: 0.75rem; border-bottom: 1px solid var(--border-subtle); line-height: 1.7; }
   .related-roman-title { display: block; font-size: .8125rem; color: var(--text-muted); }

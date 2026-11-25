@@ -307,20 +307,19 @@
     }
   }
 
-  // Intercept header search button
-  document.getElementById('nav-search-btn')?.addEventListener('click', (e) => {
-    // If on homepage and hero search exists, focus it or open modal
-    if (window.location.pathname === '/') {
+  document.querySelectorAll<HTMLAnchorElement>('#nav-search-btn, [data-open-song-search]').forEach(trigger => {
+    trigger.addEventListener('click', event => {
+      if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
       const heroSearch = document.getElementById('search-input');
-      if (heroSearch) {
-        e.preventDefault();
+      if (window.location.pathname === '/' && heroSearch) {
+        event.preventDefault();
         heroSearch.focus();
         heroSearch.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return;
+      } else if (dialog) {
+        event.preventDefault();
+        openSearchDialog();
       }
-    }
-    e.preventDefault();
-    openSearchDialog();
+    });
   });
 
   // Keyboard shortcut: '/' or Ctrl/Cmd + K

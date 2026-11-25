@@ -1,4 +1,5 @@
 import songsData from '../data/songs.json';
+import { songSearchTitle } from './song-seo';
 
 export interface Song {
   slug: string;
@@ -7,6 +8,14 @@ export interface Song {
 }
 
 export const songs: Song[] = songsData as Song[];
+
+export function browseSong(song: Pick<Song, 'slug' | 'title'>, locale: string) {
+  return {
+    slug: song.slug,
+    title: song.title,
+    romanTitle: locale === 'te' ? songSearchTitle(song, 'Telugu').romanTitle : undefined,
+  };
+}
 
 export interface LangDef {
   id: string;

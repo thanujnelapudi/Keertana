@@ -3,7 +3,9 @@ import SongRow from '../../components/SongRow.astro';
 import BrowseEnhancements from '../../components/BrowseEnhancements.astro';
 import Base from '../../layouts/Base.astro';
 import LocalLibrary from '../../components/LocalLibrary.astro';
-import { getLanguagesData, type LangData } from '../../lib/songs';
+import { browseSong, getLanguagesData, type LangData } from '../../lib/songs';
+import { songSearchTitle } from '../../lib/song-seo';
+import { worshipCollections, collectionPageUrl } from '../../lib/worship-collections';
 
 export function getStaticPaths() {
   const languages = getLanguagesData();
@@ -23,13 +25,20 @@ const { lang, allLanguages } = Astro.props;
 const siteUrl = Astro.site ? Astro.site.href.replace(/\/$/, '') : 'https://keertana.vercel.app';
 const canonical = `${siteUrl}/${lang.id}/`;
 
-const title = `${lang.label} Christian Songs & Lyrics | Keertana`;
-const description = `Discover ${lang.label} Christian worship songs and hymns. Browse ${lang.songs.length} song lyrics alphabetically on Keertana.`;
+const isTelugu = lang.id === 'telugu';
+const directoryName = isTelugu ? 'Telugu Christian Song Lyrics' : `${lang.label} Christian Songs & Lyrics`;
+const title = `${directoryName} | Keertana`;
+const songCount = lang.songs.length.toLocaleString('en-IN');
+const description = isTelugu
+  ? `Find lyrics for ${songCount} Telugu Christian songs. Browse by first letter or worship collection, read in Telugu or English letters, and print songs for your gathering.`
+  : `Discover ${lang.label} Christian worship songs and hymns. Browse ${lang.songs.length} song lyrics alphabetically on Keertana.`;
 
-const hreflang = allLanguages.map((l) => ({
-  lang: l.locale,
-  href: `${siteUrl}/${l.id}/`,
-}));
+const selectedSongs = isTelugu ? lang.songs.filter(song => [
+  'arhatha-lekunnaa-preminchaavu', 'nee-krupa-nithyamundunu', 'nee-chethitho-nannu-pattuko', 'parama-jeevamu-naaku-nivva',
+].includes(song.slug)) : [];
+const selectedCollections = isTelugu ? worshipCollections.filter(collection => [
+  'praise-and-worship', 'prayer', 'christmas', 'sunday-school',
+].includes(collection.slug)) : [];
 
 const PER_PAGE = 24;
 const initialSongs = lang.songs.slice(0, PER_PAGE);
@@ -39,7 +48,7 @@ const jsonLd = [
   {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    name: `${lang.label} Christian Songs & Lyrics`,
+    name: directoryName,
     url: canonical,
     description,
     inLanguage: lang.locale,
@@ -66,7 +75,7 @@ const jsonLd = [
   },
 ];
 
-const songsData = lang.songs.map((s) => ({ slug: s.slug, title: s.title }));
+const songsData = lang.songs.map(song => browseSong(song, lang.locale));
 ---
 
 <Base
@@ -75,7 +84,6 @@ const songsData = lang.songs.map((s) => ({ slug: s.slug, title: s.title }));
   jsonLd={jsonLd}
   canonical={canonical}
   lang={lang.locale}
-  hreflang={hreflang}
   ogLocale={lang.locale === 'te' ? 'te_IN' : lang.locale === 'hi' ? 'hi_IN' : 'en_US'}
 >
   <!-- Hero Section -->
@@ -103,7 +111,9 @@ const songsData = lang.songs.map((s) => ({ slug: s.slug, title: s.title }));
         color: var(--text);
         margin: 0 0 0.75rem;
       ">
-        {lang.label} Worship Songs
+        {isTelugu ? (
+          <><span lang="en">{directoryName}</span><span class="directory-native-heading" lang="te">తెలుగు క్రైస్తవ పాటల సాహిత్యం</span></>
+        ) : `${lang.label} Worship Songs`}
       </h1>
       <p style="
         font-size: 1.125rem;
@@ -111,8 +121,15 @@ const songsData = lang.songs.map((s) => ({ slug: s.slug, title: s.title }));
         line-height: 1.6;
         margin: 0;
       ">
-        Browse {lang.songs.length.toLocaleString()} songs and hymns with lyrics.
+        {isTelugu
+          ? <span lang="en">Read {songCount} worship songs in Telugu, or switch to English letters to sing along.</span>
+          : `Browse ${songCount} songs and hymns with lyrics.`}
       </p>
+      {isTelugu && <nav lang="en" aria-label="Explore Telugu lyrics" class="browse-shortcuts directory-shortcuts">
+        <a href="/#search" data-open-song-search>Search song titles</a>
+        <a href="#browse-filters">Browse by first letter</a>
+        <a href="#telugu-selections">Selected songs and collections</a>
+      </nav>}
     </div>
   </section>
 
@@ -154,7 +171,7 @@ const songsData = lang.songs.map((s) => ({ slug: s.slug, title: s.title }));
       </div>
 
       <!-- Letter Filter Grid -->
-      <div style="margin-bottom: 2.5rem;">
+      <div id="browse-filters" tabindex="-1" style="margin-bottom: 2.5rem;">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.875rem;">
           <h2 style="
             font-size: 0.75rem;
@@ -260,10 +277,42 @@ const songsData = lang.songs.map((s) => ({ slug: s.slug, title: s.title }));
 
     </div>
   </section>
+  {isTelugu && (
+    <div id="telugu-selections" class="container-page directory-selections" tabindex="-1" lang="en">
+      <section aria-labelledby="selected-songs-heading">
+        <h2 id="selected-songs-heading">Selected Telugu songs</h2>
+        <ul>{selectedSongs.map(song => {
+          const { romanTitle, romanTitleLang } = songSearchTitle(song, lang.label);
+          return <li><a href={`/song/${song.slug}/`}>
+            <span lang="te">{song.title}</span>{romanTitle && <small lang={romanTitleLang}>{romanTitle}</small>}
+          </a></li>;
+        })}</ul>
+      </section>
+      <section aria-labelledby="selected-collections-heading">
+        <h2 id="selected-collections-heading">Browse worship collections</h2>
+        <ul>{selectedCollections.map(collection => <li><a href={collectionPageUrl(collection.slug)}>
+          <span lang="te">{collection.nativeTitle}</span><small>{collection.title}</small>
+        </a></li>)}</ul>
+      </section>
+    </div>
+  )}
   <BrowseEnhancements />
 </Base>
 
 <style>
+  .directory-native-heading { display: block; font-size: .58em; line-height: 1.65; letter-spacing: normal; margin-top: .25em; }
+  .directory-shortcuts { justify-content: center; }
+  .directory-selections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: 2rem;
+    padding-bottom: 3rem;
+    scroll-margin-top: 6rem;
+  }
+  .directory-selections h2 { font-size: 1.25rem; font-weight: 650; margin-bottom: .5rem; }
+  .directory-selections a { display: grid; padding: .65rem .25rem; border-bottom: 1px solid var(--border-subtle); }
+  .directory-selections a:hover, .directory-selections a:focus-visible { color: var(--accent); }
+  .directory-selections small { color: var(--text-muted); font-size: .875rem; }
   .catalog-page-links { margin-block: 1.5rem; }
   .catalog-page-links summary { cursor: pointer; width: fit-content; padding-block: .75rem; }
   .catalog-page-links nav { display: flex; flex-wrap: wrap; gap: .5rem; }
@@ -418,7 +467,9 @@ const songsData = lang.songs.map((s) => ({ slug: s.slug, title: s.title }));
         const a = document.createElement('a');
         a.href = `/song/${encodeURIComponent(song.slug)}/`;
         a.className = 'song-row';
-        a.innerHTML = `<span class="song-title">${song.title}</span><span class="song-arrow" aria-hidden="true">→</span>`;
+        a.dataset.songSlug = song.slug;
+        if (song.romanTitle) a.dataset.romanTitle = song.romanTitle;
+        a.textContent = song.title;
         fragment.appendChild(a);
       }
       songList.appendChild(fragment);

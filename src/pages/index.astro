@@ -2,7 +2,7 @@
 import SongRow from '../components/SongRow.astro';
 import BrowseEnhancements from '../components/BrowseEnhancements.astro';
 import Base from '../layouts/Base.astro';
-import { getLanguagesData, type LangData } from '../lib/songs';
+import { browseSong, getLanguagesData, type LangData } from '../lib/songs';
 import LocalLibrary from '../components/LocalLibrary.astro';
 import CollectionCards from '../components/CollectionCards.astro';
 
@@ -44,7 +44,7 @@ const jsonLd = [
 const songsPayload = Object.fromEntries(
   languages.map((lang) => [
     lang.id,
-    lang.songs.map((s) => ({ slug: s.slug, title: s.title })),
+    lang.songs.map(song => browseSong(song, lang.locale)),
   ])
 );
 
@@ -95,7 +95,7 @@ const LANGS_JSON = JSON.stringify(
         max-width: 440px;
         margin: 0 auto 2rem;
       ">
-        Discover Christian worship songs and hymns in Telugu, Hindi, and English. Find the words, sing your praise, and worship God.
+        Browse <a href="/telugu/" class="hero-directory-link">Telugu Christian song lyrics</a>, or find a hymn in Hindi or English. Search by title in your own script or in English letters.
       </p>
 
       <!-- Search Wrapper -->
@@ -375,6 +375,8 @@ const LANGS_JSON = JSON.stringify(
 </Base>
 
 <style>
+  .hero-directory-link { color: var(--accent); text-decoration: underline; text-underline-offset: .18em; }
+
   .browse-section:has(#local-library:not([hidden])) { padding-top: 2rem !important; }
   .search-mode-tabs {
     display: inline-flex;
@@ -809,7 +811,9 @@ const LANGS_JSON = JSON.stringify(
       const a = document.createElement('a');
       a.href = `/song/${encodeURIComponent(song.slug)}/`;
       a.className = 'song-row';
-      a.innerHTML = `<span class="song-title">${escapeHtml(song.title)}</span><span class="song-arrow" aria-hidden="true">→</span>`;
+      a.dataset.songSlug = song.slug;
+      if (song.romanTitle) a.dataset.romanTitle = song.romanTitle;
+      a.textContent = song.title;
       fragment.appendChild(a);
     }
     songList.replaceChildren(fragment);

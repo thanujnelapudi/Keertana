@@ -4,23 +4,40 @@ import '../styles/browse.css';
 <script>
   import { readLibrary } from '../../public/local-library.js';
   const list = document.getElementById('song-list');
+
+  function textSpan(className: string, text: string, lang?: string) {
+    const span = document.createElement('span');
+    span.className = className;
+    span.textContent = text;
+    if (lang) span.lang = lang;
+    return span;
+  }
+
+  function renderNewRow(row: HTMLAnchorElement, locale: string, language: string) {
+    const content = document.createElement('span');
+    content.className = 'song-row-content';
+    content.append(textSpan('song-title', row.textContent || '', locale));
+    if (row.dataset.romanTitle) {
+      content.append(textSpan('song-roman-title', row.dataset.romanTitle, locale + '-Latn'));
+    }
+    content.append(textSpan('song-language', language));
+    const saved = textSpan('browse-saved', 'Saved');
+    saved.hidden = true;
+    const arrow = textSpan('song-arrow', '→');
+    arrow.setAttribute('aria-hidden', 'true');
+    row.replaceChildren(content, saved, arrow);
+  }
+
   if (list) {
-    async function refreshRows() {
+    function refreshRows() {
       let saved: string[] = [];
       try { saved = readLibrary(localStorage).saved; } catch { /* Reading works without storage. */ }
       list!.querySelectorAll<HTMLAnchorElement>('.song-row').forEach(row => {
-        const title = row.querySelector<HTMLElement>('.song-title');
-        if (!title) return;
-        title.lang = list!.dataset.locale || 'en';
-        let content = row.querySelector('.song-row-content');
-        if (!content) { content = document.createElement('span'); content.className = 'song-row-content'; row.insertBefore(content, title); content.append(title); }
-        let language = row.querySelector<HTMLElement>('.song-language');
-        if (!language) { language = document.createElement('span'); language.className = 'song-language'; content.append(language); }
-        language.textContent = list!.dataset.language || '';
-        let badge = row.querySelector<HTMLElement>('.browse-saved');
-        if (!badge) { badge = document.createElement('span'); badge.className = 'browse-saved'; badge.textContent = 'Saved'; row.insertBefore(badge, row.querySelector('.song-arrow')); }
-        const slug = row.dataset.songSlug || decodeURIComponent(new URL(row.href).pathname.split('/')[2] || '');
-        badge.hidden = !saved.includes(slug);
+        if (!row.querySelector('.song-row-content')) {
+          renderNewRow(row, list!.dataset.locale || 'en', list!.dataset.language || '');
+        }
+        const badge = row.querySelector<HTMLElement>('.browse-saved');
+        if (badge) badge.hidden = !saved.includes(row.dataset.songSlug || '');
       });
       const shortcut = document.getElementById('library-shortcut');
       if (shortcut) shortcut.hidden = !document.getElementById('local-library') || document.getElementById('local-library')!.hidden;
