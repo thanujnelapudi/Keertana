@@ -26,6 +26,12 @@ const siteUrl = Astro.site ? Astro.site.href.replace(/\/$/, '') : 'https://keert
 const canonical = `${siteUrl}/${lang.id}/`;
 
 const isTelugu = lang.id === 'telugu';
+const recentRecordings = [
+  { title: 'పశుశాలలో నీవు', roman: 'Pashushalalo Neevu', artist: 'TeluguGospelHits', url: 'https://music.amazon.in/albums/B0HST54GB6', platform: 'Amazon Music' },
+  { title: 'రక్షించే దేవుడు దిగి వచ్చాడు', roman: 'Rakshinche Devudu Digi Vachchadu', artist: 'WayToParadise Worship', url: 'https://www.youtube.com/watch?v=WYDgHANecto', platform: 'YouTube', lyrics: 'https://waytoparadise.org/lyrics/telugu/rakshinche-devudu-digi-vachadu/' },
+  { title: 'యేసు నీ నామమే', roman: 'Yesu Nee Namame', artist: 'John Paul · Bethany Mission', url: 'https://www.youtube.com/watch?v=SAzpCdjuhb0', platform: 'YouTube', lyrics: 'https://ambassadorofchrist.in/yesu-nee-namame-song-lyrics/' },
+  { title: 'వచ్చెను క్రీస్తు ఈ లోకానికి', roman: 'Vacchenu Kristu Ee Lokaaniki', artist: 'Ravi Mandadi', url: 'https://www.youtube.com/watch?v=F5OYeBwAMp4', platform: 'YouTube', lyrics: 'https://ambassadorofchrist.in/vachenu-kristu-song-lyrics/' },
+];
 const directoryName = isTelugu ? 'Telugu Christian Song Lyrics' : `${lang.label} Christian Songs & Lyrics`;
 const title = `${directoryName} | Keertana`;
 const songCount = lang.songs.length.toLocaleString('en-IN');
@@ -129,6 +135,7 @@ const songsData = lang.songs.map(song => browseSong(song, lang.locale));
         <a href="/#search" data-open-song-search>Search song titles</a>
         <a href="#browse-filters">Browse by first letter</a>
         <a href="#telugu-selections">Selected songs and collections</a>
+        <a href="#new-recordings">New recordings</a>
       </nav>}
     </div>
   </section>
@@ -294,12 +301,27 @@ const songsData = lang.songs.map(song => browseSong(song, lang.locale));
           <span lang="te">{collection.nativeTitle}</span><small>{collection.title}</small>
         </a></li>)}</ul>
       </section>
+      <section id="new-recordings" aria-labelledby="new-recordings-title" tabindex="-1">
+        <h2 id="new-recordings-title">November 2026 Telugu releases</h2>
+        <ul>{recentRecordings.map(recording => <li class="release-row">
+          <a href={recording.url}>
+            <span lang="te">{recording.title}</span>
+            <span lang="te-Latn">{recording.roman}</span>
+            <small>{recording.artist} · Listen on {recording.platform} ↗</small>
+          </a>
+          {recording.lyrics && <a class="release-lyrics" href={recording.lyrics} aria-label={`Read lyrics for ${recording.roman}`}>Read lyrics ↗</a>}
+        </li>)}</ul>
+      </section>
     </div>
   )}
   <BrowseEnhancements />
 </Base>
 
 <style>
+  #new-recordings { grid-column: 1 / -1; scroll-margin-top: 6rem; }
+  .release-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--border-subtle); }
+  .directory-selections .release-row a { border: 0; overflow-wrap: anywhere; }
+  .release-lyrics { flex-shrink: 0; font-size: .875rem; color: var(--accent); }
   .directory-native-heading { display: block; font-size: .58em; line-height: 1.65; letter-spacing: normal; margin-top: .25em; }
   .directory-shortcuts { justify-content: center; }
   .directory-selections {
